@@ -1,8 +1,160 @@
 ﻿@page
+@using System.Data
 @model UserModel
 @{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="d-flex align-items-center mb-2">
+    <div>
+        <h5 class="font-weight-bold mb-2">User</h5>
+        <p>User management</p>
+        <h3>@ViewData["Result"]</h3>
+    </div>
+</div>
+
+<div class="card radius-10">
+    <div class="card-body">
+        <div class="mt-1 mb-3">
+            <button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUser"><i class="bx bx-plus"></i>Add New</button>
+        </div>
+        <div class="table-responsive">
+        <table id="tableUser" class="table mb-0 align-middle" style="width:100%">
+            <thead class="table-light">
+                <tr>
+                    <th>Action</th>
+                    <th>User Name</th>
+                    <th>Full Name</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>No Hp</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                    @foreach (DataRow item in Model.GetAllUser().Rows) {
+                        <tr>
+                            <td>
+                                <div class="d-flex order-actions">
+                                    @Html.AntiForgeryToken()
+                                    <a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser('@item["UserName"]')">
+                                        <i class="bx bxs-edit"></i>
+                                    </a>
+                                    <a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank">
+                                        <i class="bx bxs-trash">
+                                        </i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td>@item["UserName"]</td>
+                            <td>@item["FullName"]</td>
+                            <td>@item["Role"]</td>
+                            <td>
+                                @if (item["IsActive"].ToString() == "Y") {
+                                    <div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
+                                        Active
+                                    </div>
+                                }else{
+                                    <div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">
+                                        Inactive
+                                    </div>
+                                }
+                            </td>
+                            <td>@item["NoHp"]</td>
+                            <td>@item["Email"]</td>
+                        </tr>
+                    }
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+
+<!-- MODAL Add -->
+<div class="modal fade" id="modalUser" tabindex="-1" aria-labelledby="modalUserLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalUserLabel">Add User</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+					aria-label="Close"></button>
+			</div>
+			<form method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="FullName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="FullName" id="FullName" placeholder="Full Name...">
+                    </div>
+                    <div class="mb-3">
+                        <label for="UserName" class="form-label">User Name</label>
+                        <input type="text" class="form-control" name="UserName" id="UserName" placeholder="User Name...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Role</label>
+                        <select class="form-select" name="Role" id="Role">
+                            <option value="" selected>Select Role...</option>
+                            <option value="ADM">Admin</option>
+                            <option value="OPR">Operator</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="NoHP" class="form-label">No HP</label>
+                        <input type="text" class="form-control" name="NoHP" id="NoHP" placeholder="No HP...">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Email</label>
+                        <input type="text" class="form-control" name="Email" id="Email" placeholder="Email...">
+                    </div>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Status</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="IsActive" id="IsActive" checked="">
+                            <label class="form-check-label" for="IsActive">Active</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary radius-8"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary radius-8"><i class="bx bx-check"></i>Submit</button>
+                </div>
+            </form>
+		</div>
+	</div>
+</div>
+<!-- END MODAL -->
+
+<script>
+	$(document).ready(function () {
+		var table = $('#tableUser').DataTable({
+		});
+	});
+
+    function editUser(userName) {
+        // Kirim permintaan ke server untuk mendapatkan data user berdasarkan ID
+        $.ajax({
+            url: 'UserModel?handler=UserById',
+            type: 'POST',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            datatype: 'json',
+            success: function(response) {
+                console.log(response);
+                // Tampilkan modal dan isi data yang diterima ke dalam formulir
+                $('#modalUser').modal('show');
+                // Misalnya, isi formulir dengan data yang diterima dari server
+                $('#FullName').val(response.FullName);
+                $('#UserName').val(response.UserName);
+                $('#Role').val(response.Role);
+                $('#NoHP').val(response.NoHP);
+                $('#Email').val(response.Email);
+                $('#IsActive').prop('checked', response.isActive == "Y" ? true : false);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+</script>

@@ -12,11 +12,16 @@ namespace Warehouse.Class
         public CommandType commandType = CommandType.Text;
         private bool disposedValue;
 
-        public SqlHelper() {
-            connection = new MySqlConnection(connectionString);
-            connection.Open();
-            cmd = connection.CreateCommand();
-        }
+        public SqlHelper()
+            {
+                var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)                                   
+                .AddJsonFile("appsettings.json",optional:true)
+                .Build();
+                connection = new MySqlConnection(configuration.GetConnectionString("Warehouse"));
+                connection.Open();
+                cmd = connection.CreateCommand();
+            }
 
         public DataTable ExecuteDataTable()
         {

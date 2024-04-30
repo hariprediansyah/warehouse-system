@@ -13,10 +13,11 @@ namespace Warehouse.Pages
 		}
 
 		public DataTable GetAllCategory(){
-            using SqlHelper sqlHelper = new SqlHelper();
-            sqlHelper.commandText = "SELECT * FROM MsCategory";
+            using SqlHelper sqlHelper = new();
+            sqlHelper.commandText = "SELECT * FROM Category";
             return sqlHelper.ExecuteDataTable();
         }
+
 	}
 
 	public class MasterData
