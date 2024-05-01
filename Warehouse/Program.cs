@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 using Warehouse.Class;
+using Warehouse.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +9,10 @@ builder.Configuration.AddJsonFile("appsettings.json");
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
+builder.Services.AddDbContext<WarehouseContext>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSession();
+
 
 var app = builder.Build();
 
@@ -23,6 +29,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseSession();
 
 app.MapRazorPages();
 

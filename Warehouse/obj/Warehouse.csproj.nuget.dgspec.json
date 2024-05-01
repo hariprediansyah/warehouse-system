@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\warehouse-system\\warehouse\\Warehouse.csproj": {}
+    "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj": {}
   },
   "projects": {
-    "D:\\Project\\warehouse-system\\warehouse\\Warehouse.csproj": {
+    "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project\\warehouse-system\\warehouse\\Warehouse.csproj",
+        "projectUniqueName": "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj",
         "projectName": "Warehouse",
-        "projectPath": "D:\\Project\\warehouse-system\\warehouse\\Warehouse.csproj",
-        "packagesPath": "C:\\Users\\MyBook Z Series\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\warehouse-system\\warehouse\\obj\\",
+        "projectPath": "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj",
+        "packagesPath": "C:\\Users\\coyha\\.nuget\\packages\\",
+        "outputPath": "E:\\Projects\\Warehouse\\Warehouse\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\MyBook Z Series\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\coyha\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -34,15 +34,30 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "MySql.Data": {
+            "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.3.0, )"
+              "version": "[8.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "MySql.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.2, )"
             }
           },
           "imports": [
@@ -64,7 +79,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

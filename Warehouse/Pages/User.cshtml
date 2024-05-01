@@ -16,7 +16,10 @@
 <div class="card radius-10">
     <div class="card-body">
         <div class="mt-1 mb-3">
-            <button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUser"><i class="bx bx-plus"></i>Add New</button>
+            <button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addUser()">
+                <i class="bx bx-plus"></i>
+                Add New
+            </button>
         </div>
         <div class="table-responsive">
         <table id="tableUser" class="table mb-0 align-middle" style="width:100%">
@@ -32,25 +35,26 @@
                 </tr>
             </thead>
             <tbody>
-                    @foreach (DataRow item in Model.GetAllUser().Rows) {
+                    @* @foreach (DataRow item in Model.GetAllUser().Rows) { *@
+                    @foreach (UserDataModel item in Model.userList)
+                    {
                         <tr>
                             <td>
                                 <div class="d-flex order-actions">
-                                    @Html.AntiForgeryToken()
-                                    <a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser('@item["UserName"]')">
+                                    <a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser('@item.UserName')">
                                         <i class="bx bxs-edit"></i>
                                     </a>
-                                    <a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank">
+                                    <a type="button" class="text-danger bg-light-danger border-0" onclick="deleteDataShow('@item.UserName')" data-bs-toggle="modal" data-bs-target="#modalDelete">
                                         <i class="bx bxs-trash">
                                         </i>
                                     </a>
                                 </div>
                             </td>
-                            <td>@item["UserName"]</td>
-                            <td>@item["FullName"]</td>
-                            <td>@item["Role"]</td>
+                            <td>@item.UserName</td>
+                            <td>@item.FullName</td>
+                            <td>@item.Role</td>
                             <td>
-                                @if (item["IsActive"].ToString() == "Y") {
+                                @if (item.IsActive == "Y") {
                                     <div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
                                         Active
                                     </div>
@@ -60,8 +64,8 @@
                                     </div>
                                 }
                             </td>
-                            <td>@item["NoHp"]</td>
-                            <td>@item["Email"]</td>
+                            <td>@item.NoHP</td>
+                            <td>@item.Email</td>
                         </tr>
                     }
             </tbody>
@@ -116,7 +120,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary radius-8"
                         data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary radius-8"><i class="bx bx-check"></i>Submit</button>
+                    <input type="submit" class="btn btn-primary radius-8" asp-page-handler="SaveData" value="Save"><i class="bx bx-check"></i></input>
                 </div>
             </form>
 		</div>
@@ -124,37 +128,72 @@
 </div>
 <!-- END MODAL -->
 
+<div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content radius-10">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDeleteLabel">Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure want to delete this data
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary radius-8"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <form method="post">
+                    <input type="hidden" id="hdnUsernameDelete" name="hdnUsernameDelete"/>
+                    <input type="submit" class="btn btn-danger radius-8" asp-page-handler="BtnDelete" value="Delete" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 	$(document).ready(function () {
 		var table = $('#tableUser').DataTable({
 		});
 	});
 
+    let deleteDataShow = (UserName) => {
+        $("#hdnUsernameDelete").val(UserName);
+    }
+
     function editUser(userName) {
-        // Kirim permintaan ke server untuk mendapatkan data user berdasarkan ID
         $.ajax({
-            url: 'UserModel?handler=UserById',
-            type: 'POST',
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("XSRF-TOKEN",
-                    $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
+            url: '?handler=ViewDetail&UserName=' + userName,
+            type: 'GET',
             datatype: 'json',
-            success: function(response) {
-                console.log(response);
-                // Tampilkan modal dan isi data yang diterima ke dalam formulir
-                $('#modalUser').modal('show');
-                // Misalnya, isi formulir dengan data yang diterima dari server
-                $('#FullName').val(response.FullName);
-                $('#UserName').val(response.UserName);
-                $('#Role').val(response.Role);
-                $('#NoHP').val(response.NoHP);
-                $('#Email').val(response.Email);
-                $('#IsActive').prop('checked', response.isActive == "Y" ? true : false);
+            success: function (response) {
+                $("#FullName").val(response.fullName);
+                $("#UserName").val(response.userName);
+                $("#Role").val(response.role);
+                $("#NoHP").val(response.noHP);
+                $("#Email").val(response.email);
+                $("#modalUserLabel").text("Edit User");
+                IsActive.checked = (response.isActive == "Y");
+
+                $("#modalUser").modal('show');
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
             }
         });
+    }
+
+    function addUser(){
+        $("#FullName").val("");
+        $("#UserName").val("");
+        $("#Role").val("");
+        $("#NoHP").val("");
+        $("#Email").val("");
+        $("#modalUserLabel").text("Add User");
+        IsActive.checked = true;
+
+        $("#modalUser").modal('show');
     }
 </script>

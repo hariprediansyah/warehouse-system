@@ -1,11 +1,22 @@
-﻿namespace Warehouse;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Warehouse;
 
 public class UserDataModel
 {
-    public required string FullName { get; set; }
-    public required string UserName { get; set; }
-    public required string Role { get; set; }
-    public required string NoHP { get; set; }
-    public required string Email { get; set; }
-    public required string IsActive { get; set; }
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Column("UserName")]
+    public string UserName { get; set; }
+    public string FullName { get; set; }
+    public string Role { get; set; }
+    public string NoHP { get; set; }
+    public string? UserInput { get; set; }
+    public DateTime? TimeInput { get; set; }
+    public string? UserEdit{ get; set; }
+    public DateTime? TimeEdit { get; set; }
+    public string Email { get; set; }
+    public string IsActive { get; set; }
+    public DateTime? LastLogin { get; set; }
+    public string Password { get; set; }
 }
