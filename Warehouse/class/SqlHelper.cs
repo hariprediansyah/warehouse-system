@@ -33,6 +33,19 @@ namespace Warehouse.Class
             return dt;
         }
 
+        public DataRow ExecuteDataRow()
+        {
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
+            MySqlDataReader dr = cmd.ExecuteReader();
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
+            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            return dt.Rows[0];
+        }
+
         public void ExecuteNonQuery()
         {
             cmd.CommandText = commandText;

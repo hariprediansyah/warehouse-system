@@ -1,95 +1,85 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using Warehouse.Class;
-using Warehouse.Models;
 
 namespace Warehouse.Pages
 {
     public class UserModel : PageModel
     {
-        private readonly WarehouseContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
 
 		[BindProperty]
 		public UserDataModel user { get; set; }
-        public List<UserDataModel> userList { get; set; }
-        public UserModel(WarehouseContext context, IHttpContextAccessor contextAccessor)
+
+        public UserModel(IHttpContextAccessor contextAccessor)
         {
-            _context = context;
             _contextAccessor = contextAccessor;
         }
 
         public void OnGet()
         {
-            FillData();
+            
         }
 
         public void OnPostSaveData() {
-            var result = _context.User.FirstOrDefault(row => row.UserName == user.UserName);            
             using SqlHelper sqlHelper = new SqlHelper();
-
-            sqlHelper.commandText = " INSERT INTO user (UserName, FullName, Role, NoHP, UserInput, TimeInput, Email, IsActive, Password) " +
+            if (user.OldUserName == "" | user.OldUserName == null)
+            {
+                sqlHelper.commandText = " INSERT INTO user (UserName, FullName, Role, NoHP, UserInput, TimeInput, Email, IsActive, Password) " +
                                     " VALUES (@UserName, @FullName, @Role, @NoHP, @User, CURRENT_TIMESTAMP, @Email, @IsActive, @Password)";
-            sqlHelper.AddParameter("@UserName", user.UserName, MySqlDbType.VarChar);
-            sqlHelper.AddParameter("@FullName", user.FullName, MySqlDbType.LongText);
-            sqlHelper.AddParameter("@Role", user.Role, MySqlDbType.LongText);
-            sqlHelper.AddParameter("@NoHP", user.NoHP, MySqlDbType.LongText);
-            sqlHelper.AddParameter("@User", _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME), MySqlDbType.LongText);
-            sqlHelper.AddParameter("@Email", user.Email, MySqlDbType.LongText);
-            sqlHelper.AddParameter("@IsActive", user.IsActive == null ? "N" : "Y", MySqlDbType.LongText);
-            sqlHelper.AddParameter("@Password", Util.GetBase64(user.UserName), MySqlDbType.LongText);
-
-            sqlHelper.commandText = "UPDATE user SET UserName = @UserNameNew, FullName = @FullName,Role = @Role , NoHP = @NoHP," +
+                sqlHelper.AddParameter("@UserName", user.UserName, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@FullName", user.FullName, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@Role", user.Role, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@NoHP", user.NoHP, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@User", _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME), MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@Email", user.Email, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@IsActive", user.IsActive == null ? "N" : "Y", MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@Password", Util.GetBase64(user.UserName), MySqlDbType.VarChar);
+            }
+            else
+            {
+                sqlHelper.commandText = "UPDATE user SET UserName = @UserName, FullName = @FullName,Role = @Role , NoHP = @NoHP," +
                                     "Email = @Email, IsActive = @IsActive, TimeEdit = CURRENT_TIMESTAMP, UserEdit = @User " +
-                                    "WHERE UserName = @UserName";
-
+                                    "WHERE UserName = @OldUserName";
+                sqlHelper.AddParameter("@UserName", user.UserName, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@OldUserName", user.OldUserName, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@FullName", user.FullName, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@Role", user.Role, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@NoHP", user.NoHP, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@User", _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME), MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@Email", user.Email, MySqlDbType.VarChar);
+                sqlHelper.AddParameter("@IsActive", user.IsActive == null ? "N" : "Y", MySqlDbType.VarChar);
+            }
 			sqlHelper.ExecuteNonQuery();
-
-			//if (result == null)
-   //         {
-   //             user.IsActive = user.IsActive == null ? "N" : "Y";
-   //             user.Password = Util.GetBase64(user.UserName);
-   //             user.UserInput = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME);
-   //             user.TimeInput = DateTime.Now;
-   //             _context.ChangeTracker.Clear();
-   //             _context.User.Add(user);
-   //             _context.SaveChanges();
-   //         }
-   //         else
-   //         {
-			//	user.IsActive = user.IsActive == null ? "N" : "Y";
-			//	user.UserEdit = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME);
-   //             user.TimeEdit = DateTime.Now;
-   //             _context.ChangeTracker.Clear();
-   //             _context.User.Update(user);
-   //             _context.SaveChanges();
-   //         }
-            FillData();
         }
 
         public IActionResult OnPostBtnDelete(string hdnUsernameDelete)
         {
-            user = _context.User.FirstOrDefault(user => user.UserName == hdnUsernameDelete);
-            _context.User.Remove(user);
-            _context.SaveChanges();
-            FillData();
+            using SqlHelper sqlHelper = new SqlHelper();
+            sqlHelper.commandText = "DELETE FROM user WHERE UserName = @UserName";
+            sqlHelper.AddParameter("@UserName", hdnUsernameDelete, MySqlDbType.VarChar);
+            sqlHelper.ExecuteNonQuery();
             return Page();
         }
 
         public IActionResult OnGetViewDetail(string UserName)
         {
-            user = _context.User.FirstOrDefault(user=>user.UserName == UserName);
-            _context.SaveChanges();
-            return new JsonResult(user);
+            using SqlHelper sqlHelper = new SqlHelper();
+            sqlHelper.commandText = "SELECT * FROM user WHERE UserName = @UserName";
+            sqlHelper.AddParameter("@UserName", UserName, MySqlDbType.VarChar);
+            var result = sqlHelper.ExecuteDataTable();
+            return new JsonResult(Util.DataRowToDictionary(result));
         }
 
-        public void FillData()
+        public DataTable GetUserData()
         {
-            userList = [.. _context.User.Where(el => el.Role != Util.ROLE_SUPER_ADMIN)];
+            using SqlHelper sqlHelper = new();
+            sqlHelper.commandText = "SELECT * FROM user WHERE Role <> @RoleExcept";
+            sqlHelper.AddParameter("@RoleExcept", Util.ROLE_SUPER_ADMIN, MySqlDbType.VarChar);
+            return sqlHelper.ExecuteDataTable();
         }
     }
 }

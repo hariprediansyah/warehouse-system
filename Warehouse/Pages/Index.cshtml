@@ -4,7 +4,55 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
+@* <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div> *@
+<div class="card radius-5">
+    <div class="card-body">
+        <div class="container">
+            <p class="fs-4 text-black" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Welcome to Warehouse Management System</p>
+        </div>
+    </div>
 </div>
+
+<div class="card radius-5">
+    <div class="card-body">
+        <div class="container">
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Master Data</h2>
+                    <ul class="list-group list-unstyled">
+                        <li class="list-group-item">
+                            <a href="/user" class="radius-8 btn btn-outline-primary w-50 align-items-start"><i class="fas fa-users"></i> Manage Users</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class="fas fa-box"></i> Manage Branch</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class="fas fa-box"></i> Manage Products</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class="fas fa-warehouse"></i> Manage Warehouses</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class='fas fa-tags'></i> Manage Categories</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Transactions</h2>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="/transaction" class="radius-8 p-2 btn btn-outline-success w-50 align-items-center">Incoming Transactions</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/transaction" class="radius-8 p-2 btn btn-outline-danger w-50 align-items-center">Outgoing Transactions</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

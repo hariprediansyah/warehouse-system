@@ -36,25 +36,26 @@
             </thead>
             <tbody>
                     @* @foreach (DataRow item in Model.GetAllUser().Rows) { *@
-                    @foreach (UserDataModel item in Model.userList)
+                    @foreach (DataRow item in Model.GetUserData().Rows)
                     {
                         <tr>
                             <td>
                                 <div class="d-flex order-actions">
-                                    <a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser('@item.UserName')">
+                                    <a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser('@item["UserName"]')">
                                         <i class="bx bxs-edit"></i>
                                     </a>
-                                    <a type="button" class="text-danger bg-light-danger border-0" onclick="deleteDataShow('@item.UserName')" data-bs-toggle="modal" data-bs-target="#modalDelete">
+                                    <a type="button" class="text-danger bg-light-danger border-0" onclick="deleteDataShow('@item["UserName"]')" data-bs-toggle="modal" data-bs-target="#modalDelete">
                                         <i class="bx bxs-trash">
                                         </i>
                                     </a>
                                 </div>
                             </td>
-                            <td>@item.UserName</td>
-                            <td>@item.FullName</td>
-                            <td>@item.Role</td>
+                            <td>@item["UserName"]</td>
+                            <td>@item["FullName"]</td>
+                            <td>@item["Role"]</td>
                             <td>
-                                @if (item.IsActive == "Y") {
+                                @if (item["IsActive"].ToString() == "Y")
+                                {
                                     <div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
                                         Active
                                     </div>
@@ -64,8 +65,8 @@
                                     </div>
                                 }
                             </td>
-                            <td>@item.NoHP</td>
-                            <td>@item.Email</td>
+                            <td>@item["NoHP"]</td>
+                            <td>@item["Email"]</td>
                         </tr>
                     }
             </tbody>
@@ -85,6 +86,7 @@
 			</div>
 			<form method="post">
                 <div class="modal-body">
+                    <input type="hidden" id="OldUserName" name="OldUserName"/>
                     <div class="mb-3">
                         <label for="FullName" class="form-label">Full Name</label>
                         <input type="text" class="form-control" name="FullName" id="FullName" placeholder="Full Name...">
@@ -169,13 +171,15 @@
             type: 'GET',
             datatype: 'json',
             success: function (response) {
-                $("#FullName").val(response.fullName);
-                $("#UserName").val(response.userName);
-                $("#Role").val(response.role);
-                $("#NoHP").val(response.noHP);
-                $("#Email").val(response.email);
+                console.log(response);
+                $("#FullName").val(response.FullName);
+                $("#UserName").val(response.UserName);
+                $("#Role").val(response.Role);
+                $("#NoHP").val(response.NoHP);
+                $("#Email").val(response.Email);
+                $("#OldUserName").val(response.UserName);
                 $("#modalUserLabel").text("Edit User");
-                IsActive.checked = (response.isActive == "Y");
+                IsActive.checked = (response.IsActive == "Y");
 
                 $("#modalUser").modal('show');
             },
@@ -191,6 +195,7 @@
         $("#Role").val("");
         $("#NoHP").val("");
         $("#Email").val("");
+        $("#OldUserName").val("");
         $("#modalUserLabel").text("Add User");
         IsActive.checked = true;
 

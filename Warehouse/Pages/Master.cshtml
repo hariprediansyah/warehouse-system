@@ -4,21 +4,39 @@
 @{
 }
 
+<div class="d-flex align-items-center mb-2">
+    <div>
+        <h5 class="font-weight-bold mb-2">Master</h5>
+        <p>Manage data master</p>
+        <h3>@ViewData["Result"]</h3>
+    </div>
+</div>
+
 <div class="card radius-10">
 	<div class="card-body">
 		<ul class="nav nav-tabs nav-primary" role="tablist">
 			<li class="nav-item" role="presentation">
-				<a class="nav-link active" data-bs-toggle="tab" href="#bankMenu" role="tab" aria-selected="true">
+				<a class="nav-link active" data-bs-toggle="tab" href="#groupBranch" role="tab" aria-selected="true">
+				<div class="d-flex align-items-center">
+						<div class="tab-icon">
+							<i class='bx bxs-map font-18 me-1'></i>
+						</div>
+						<div class="tab-title">Branch</div>
+					</div>
+				</a>
+			</li>
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" data-bs-toggle="tab" href="#groupCategory" role="tab" aria-selected="false">
 					<div class="d-flex align-items-center">
 						<div class="tab-icon">
-							<i class='bx bxs-box font-18 me-1'></i>
+							<i class='bx bx-shape-square font-18 me-1'></i>
 						</div>
 						<div class="tab-title">Category</div>
 					</div>
 				</a>
 			</li>
 			<li class="nav-item" role="presentation">
-				<a class="nav-link" data-bs-toggle="tab" href="#groupCategory" role="tab" aria-selected="false">
+				<a class="nav-link" data-bs-toggle="tab" href="#groupProduct" role="tab" aria-selected="false">
 					<div class="d-flex align-items-center">
 						<div class="tab-icon">
 							<i class='bx bxs-cube font-18 me-1'></i>
@@ -28,7 +46,7 @@
 				</a>
 			</li>
 			<li class="nav-item" role="presentation">
-				<a class="nav-link" data-bs-toggle="tab" href="#blastConfig" role="tab" aria-selected="false">
+				<a class="nav-link" data-bs-toggle="tab" href="#groupWarehouse" role="tab" aria-selected="false">
 					<div class="d-flex align-items-center">
 						<div class="tab-icon">
 							<i class='bx bx-home-alt font-18 me-1'></i>
@@ -39,27 +57,67 @@
 			</li>
 		</ul>
 		<div class="tab-content py-3">
-			<div class="tab-pane fade show active" id="bankMenu" role="tabpanel">
+			<div class="tab-pane fade show active" id="groupBranch" role="tabpanel">
 				<div class="d-flex align-items-center mb-4">
 					<div>
-						<h5 class="font-weight-bold">Category</h5>
+						<h5 class="font-weight-bold mb-2">Branch</h5>
 					</div>
 					<div class="ms-auto">
-						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addNewCategory"><i class="bx bx-plus"></i>Add New</button>
+						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addBranch()"><i class="bx bx-plus"></i>Add New</button>
 					</div>
 				</div>
 
-				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2">
+				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertBranch">
 					<div class="d-flex align-items-center">
 						<div class="font-35 text-success">
 							<i class="bx bxs-check-circle"></i>
 						</div>
 						<div class="ms-3">
 							<h6 class="mb-0 text-success">Success!</h6>
-							<div>Congrats! You've successfully added data.</div>
+							<div id="alertBranchText">You've successfully added data.</div>
 						</div>
 					</div>
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					<button type="button" class="btn-close" onclick="$('#alertBranch').addClass('d-none')" aria-label="Close"></button>
+				</div>
+
+				<div class="table-responsive">
+					<table id="tableBranch" class="table mb-0 align-middle" style="width:100%">
+						<thead class="table-light">
+							<tr>
+								<th>Action</th>
+								<th>Code</th>
+								<th>Name</th>
+								<th>Status</th>
+								<th>User Input</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane fade show" id="groupCategory" role="tabpanel">
+				<div class="d-flex align-items-center mb-4">
+					<div>
+						<h5 class="font-weight-bold">Category</h5>
+					</div>
+					<div class="ms-auto">
+						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addCategory()">
+							<i class="bx bx-plus"></i>Add New</button>
+					</div>
+				</div>
+
+				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertCategory">
+					<div class="d-flex align-items-center">
+						<div class="font-35 text-success">
+							<i class="bx bxs-check-circle"></i>
+						</div>
+						<div class="ms-3">
+							<h6 class="mb-0 text-success">Success!</h6>
+							<div id="alertCategoryText">You've successfully added data.</div>
+						</div>
+					</div>
+					<button type="button" class="btn-close" onclick="$('#alertCategory').addClass('d-none')" aria-label="Close"></button>
 				</div>
 
 				<div class="table-responsive">
@@ -74,290 +132,89 @@
 							</tr>
 						</thead>
 						<tbody>
-							@foreach (DataRow data in Model.GetAllCategory().Rows)
-							{
-								<tr>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-primary bg-light-primary border-0 me-3" data-bs-toggle="modal" data-bs-target="#modalEditBank"><i class="bx bxs-edit"></i></a>
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-									<td>@data["Code"]</td>
-									<td>@data["Name"]</td>
-									<td>@data["Description"]</td>
-									<td>@data["UserInput"]</td>
-								</tr>
-							}
 						</tbody>
 					</table>
 				</div>
 			</div>
-			<div class="tab-pane fade" id="groupCategory" role="tabpanel">
+			<div class="tab-pane fade" id="groupProduct" role="tabpanel">
 				<div class="d-flex align-items-center mb-4">
 					<div>
-						<h5 class="font-weight-bold mb-2">Master Grouping Category</h5>
+						<h5 class="font-weight-bold mb-2">Product</h5>
 					</div>
 					<div class="ms-auto">
-						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addNewGroupC"><i class="bx bx-plus"></i>Add New</button>
+						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addProduct()"><i class="bx bx-plus"></i>Add New</button>
 					</div>
 				</div>
 
-				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2">
+				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertProduct">
 					<div class="d-flex align-items-center">
 						<div class="font-35 text-success">
 							<i class="bx bxs-check-circle"></i>
 						</div>
 						<div class="ms-3">
 							<h6 class="mb-0 text-success">Success!</h6>
-							<div>Congrats! You've successfully added data.</div>
+							<div id="alertProductText">You've successfully added data.</div>
 						</div>
 					</div>
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					<button type="button" class="btn-close" onclick="$('#alertProduct').addClass('d-none')" aria-label="Close"></button>
 				</div>
 
 				<div class="table-responsive">
-					<table id="tableGroupingCategory" class="table mb-0 align-middle" style="width:100%">
+					<table id="tableProduct" class="table mb-0 align-middle" style="width:100%">
 						<thead class="table-light">
 							<tr>
-								<th>ID Group</th>
-								<th>Group Name</th>
-								<th>Status</th>
-								<th>View Details</th>
 								<th>Action</th>
+								<th>Code</th>
+								<th>Name</th>
+								<th>Category</th>
+								<th>Description</th>
+								<th>User Input</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>01</td>
-								<td>EOB</td>
-								<td>
-									<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-										Active
-									</div>
-								</td>
-								<td>
-									<button type="button" class="btn btn-primary btn-sm radius-30 px-4" data-bs-toggle="modal" data-bs-target="#modalViewDetail">
-										View
-										Details
-									</button>
-								</td>
-								<td>
-									<div class="d-flex order-actions">
-										<a type="button" class="text-primary bg-light-primary border-0 me-3" data-bs-toggle="modal" data-bs-target="#modalEditGroupCategory"><i class="bx bxs-edit"></i></a>
-										<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>02</td>
-								<td>CASH OUT</td>
-								<td>
-									<div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">
-										Inactive
-									</div>
-								</td>
-								<td>
-									<button type="button" class="btn btn-primary btn-sm radius-30 px-4" data-bs-toggle="modal" data-bs-target="#modalViewDetail">
-										View
-										Details
-									</button>
-								</td>
-								<td>
-									<div class="d-flex order-actions">
-										<a type="button" class="text-primary bg-light-primary border-0 me-3" data-bs-toggle="modal" data-bs-target="#modalEditGroupCategory"><i class="bx bxs-edit"></i></a>
-										<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-									</div>
-								</td>
-							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
-			<div class="tab-pane fade" id="blastConfig" role="tabpanel">
-				<div class="btn-group-round text-center">
-					<div class="btn-group">
-						<button type="button" class="btn btn-white tablinks selected" onclick="toggleBtn(event, '3Hours')">Outstanding 1-3 Hours / Daily</button>
-						<button type="button" class="btn btn-white tablinks" onclick="toggleBtn(event, '6Hours')">Outstanding > 6 Hours</button>
+			<div class="tab-pane fade" id="groupWarehouse" role="tabpanel">
+				<div class="d-flex align-items-center mb-4">
+					<div>
+						<h5 class="font-weight-bold mb-2">Warehouse</h5>
 					</div>
-				</div>
-				<hr />
-				<div class="blast-config" id="3Hours">
-					<div class="d-flex align-items-center mb-4">
-						<div>
-							<h5 class="font-weight-bold mb-2">Outstanding 1-3 Hours / Daily</h5>
-						</div>
-						<div class="ms-auto">
-							<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addNewOutstanding3Hours"><i class="bx bx-plus"></i>Add New</button>
-						</div>
-					</div>
-
-					<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2">
-						<div class="d-flex align-items-center">
-							<div class="font-35 text-success">
-								<i class="bx bxs-check-circle"></i>
-							</div>
-							<div class="ms-3">
-								<h6 class="mb-0 text-success">Success!</h6>
-								<div>Congrats! You've successfully added data.</div>
-							</div>
-						</div>
-						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>
-
-					<div class="table-responsive mb-5">
-						<table id="tableOutstanding3Hours" class="table mb-0 align-middle" style="width:100%">
-							<thead class="table-light">
-								<tr>
-									<th>Employee Code</th>
-									<th>Name</th>
-									<th>Phone Number</th>
-									<th>Branch</th>
-									<th>Status</th>
-									<th>Action</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>WSS-11231</td>
-									<td>John Walker</td>
-									<td>088079878692</td>
-									<td>CIDENG</td>
-									<td>
-										<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-											Active
-										</div>
-									</td>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>WSS-11231</td>
-									<td>Anisa</td>
-									<td>088079878692</td>
-									<td>CIDENG</td>
-									<td>
-										<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-											Active
-										</div>
-									</td>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>WSS-11231</td>
-									<td>Hary Maguire</td>
-									<td>088079878692</td>
-									<td>CIDENG</td>
-									<td>
-										<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-											Active
-										</div>
-									</td>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>WSS-11231</td>
-									<td>Paul</td>
-									<td>088079878692</td>
-									<td>CIDENG</td>
-									<td>
-										<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-											Active
-										</div>
-									</td>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>WSS-11231</td>
-									<td>Felix</td>
-									<td>088079878692</td>
-									<td>CIDENG</td>
-									<td>
-										<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-											Active
-										</div>
-									</td>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
+					<div class="ms-auto">
+						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addWarehouse()"><i class="bx bx-plus"></i>Add New</button>
 					</div>
 				</div>
 
-				<div class="blast-config" id="6Hours" style="display: none;">
-					<div class="d-flex align-items-center mb-4">
-						<div>
-							<h5 class="font-weight-bold mb-2">Outstanding > 6 Hours</h5>
+				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertWarehouse">
+					<div class="d-flex align-items-center">
+						<div class="font-35 text-success">
+							<i class="bx bxs-check-circle"></i>
 						</div>
-						<div class="ms-auto">
-							<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addNewOutstanding6Hours"><i class="bx bx-plus"></i>Add New</button>
+						<div class="ms-3">
+							<h6 class="mb-0 text-success">Success!</h6>
+							<div id="alertWarehouseText">You've successfully added data.</div>
 						</div>
 					</div>
+					<button type="button" class="btn-close" onclick="$('#alertWarehouse').addClass('d-none')" aria-label="Close"></button>
+				</div>
 
-					<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2">
-						<div class="d-flex align-items-center">
-							<div class="font-35 text-success">
-								<i class="bx bxs-check-circle"></i>
-							</div>
-							<div class="ms-3">
-								<h6 class="mb-0 text-success">Success!</h6>
-								<div>Congrats! You've successfully added data.</div>
-							</div>
-						</div>
-						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>
-
-					<div class="table-responsive">
-						<table id="tableOutstanding6Hours" class="table mb-0 align-middle" style="width:100%">
-							<thead class="table-light">
-								<tr>
-									<th>Employee Code</th>
-									<th>Name</th>
-									<th>Phone Number</th>
-									<th>Branch</th>
-									<th>Status</th>
-									<th>Action</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>WSS-11231</td>
-									<td>JOHN WALKER</td>
-									<td>088079878692</td>
-									<td>CIDENG</td>
-									<td>
-										<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-											Active
-										</div>
-									</td>
-									<td>
-										<div class="d-flex order-actions">
-											<a type="button" class="text-danger bg-light-danger border-0" data-bs-toggle="modal" data-bs-target="#modalDeleteBank"><i class="bx bxs-trash"></i></a>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+				<div class="table-responsive">
+					<table id="tableWarehouse" class="table mb-0 align-middle" style="width:100%">
+						<thead class="table-light">
+							<tr>
+								<th>Action</th>
+								<th>Code</th>
+								<th>Name</th>
+								<th>Branch</th>
+								<th>Address</th>
+								<th>Status</th>
+								<th>User Input</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -365,44 +222,630 @@
 </div>
 
 <!-- MODAL Add -->
-<div class="modal fade" id="addNewCategory" tabindex="-1" aria-labelledby="addNewCategoryLabel" aria-hidden="true">
+<div class="modal fade" id="modalCategory" tabindex="-1" aria-labelledby="modalCategoryLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-centered">
 		<div class="modal-content radius-10">
 			<div class="modal-header">
-				<h5 class="modal-title" id="addNewCategoryLabel">Add New Category</h5>
+				<h5 class="modal-title" id="modalCategoryLabel">Add Category</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal"
 					aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
+				<input type="hidden" id="IsNew" name="IsNew" />
 				<div class="mb-3">
-					<label class="form-label">Select Bank</label>
-					<select class="form-select" id="selectBank">
-						<option value="" selected>Select Bank...</option>
-						<option value="admf">ADMF - PT ADIRA DINAMIKA MULTI FINANCE</option>
-						<option value="agr">AGR - BANK AGRIS</option>
+					<label for="Code" class="form-label">Code</label>
+					<input type="text" class="form-control" name="Code" id="Code" placeholder="Code...">
+				</div>
+				<div class="mb-3">
+					<label for="Name" class="form-label">Name</label>
+					<input type="text" class="form-control" name="Name" id="Name" placeholder="Name...">
+				</div>
+				<div class="mb-3">
+					<label for="Description" class="form-label">Description</label>
+					<input type="text" class="form-control" name="Description" id="Description" placeholder="Description...">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary radius-8" onclick="saveCategory()">
+					<i class="bx bx-check"></i>
+					Save
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalProduct" tabindex="-1" aria-labelledby="modalProductLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalProductLabel">Add Product</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" id="IsNewProduct" />
+				<div class="mb-3">
+					<label for="Code" class="form-label">Code</label>
+					<input type="text" class="form-control" id="CodeProduct" placeholder="Code...">
+				</div>
+				<div class="mb-3">
+					<label for="Name" class="form-label">Name</label>
+					<input type="text" class="form-control" id="NameProduct" placeholder="Name...">
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Select Category</label>
+					<select class="form-select" id="CategoryProduct">
+						<option value="" selected>Select Category...</option>
+						@foreach (DataRow dr in Model.GetAllCategory().Rows)
+						{
+							<option value='@dr["Code"]'>@dr["Name"]</option>
+						}
 					</select>
+				</div>
+				<div class="mb-3">
+					<label for="Description" class="form-label">Description</label>
+					<input type="text" class="form-control" id="DescriptionProduct" placeholder="Description...">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary radius-8" onclick="saveProduct()">
+					<i class="bx bx-check"></i>
+					Save
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalBranch" tabindex="-1" aria-labelledby="modalBranchLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalBranchLabel">Add Branch</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" id="IsNewBranch" />
+				<div class="mb-3">
+					<label for="CodeBranch" class="form-label">Code</label>
+					<input type="text" class="form-control" id="CodeBranch" placeholder="Code...">
+				</div>
+				<div class="mb-3">
+					<label for="NameBranch" class="form-label">Name</label>
+					<input type="text" class="form-control" id="NameBranch" placeholder="Name...">
 				</div>
 				<div class="mb-3">
 					<label for="" class="form-label">Status</label>
 					<div class="form-check form-switch">
-						<input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="">
-						<label class="form-check-label" for="flexSwitchCheckChecked">Active</label>
+						<input class="form-check-input" type="checkbox" id="IsActiveBranch" checked="">
+						<label class="form-check-label" for="IsActive">Active</label>
 					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary radius-8"
-					data-bs-dismiss="modal">Cancel</button>
-				<button type="button" class="btn btn-primary radius-8"><i class="bx bx-check"></i>Submit</button>
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary radius-8" onclick="saveBranch()">
+					<i class="bx bx-check"></i>
+					Save
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalWarehouse" tabindex="-1" aria-labelledby="modalWarehouseLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalWarehouseLabel">Add Warehouse</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" id="IsNewWarehouse" />
+				<div class="mb-3">
+					<label for="CodeWarehouse" class="form-label">Code</label>
+					<input type="text" class="form-control" id="CodeWarehouse" placeholder="Code...">
+				</div>
+				<div class="mb-3">
+					<label for="NameWarehouse" class="form-label">Name</label>
+					<input type="text" class="form-control" id="NameWarehouse" placeholder="Name...">
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Select Branch</label>
+					<select class="form-select" id="BranchWarehouse">
+						<option value="" selected>Select Branch...</option>
+						@foreach (DataRow dr in Model.GetAllBranch().Rows)
+						{
+							<option value='@dr["Code"]'>@dr["Name"]</option>
+						}
+					</select>
+				</div>
+				<div class="mb-3">
+					<label for="AddressWarehouse" class="form-label">Address</label>
+					<input type="text" class="form-control" id="AddressWarehouse" placeholder="Address...">
+				</div>
+				<div class="mb-3">
+					<label for="" class="form-label">Status</label>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" id="IsActiveWarehouse" checked="">
+						<label class="form-check-label" for="IsActive">Active</label>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary radius-8" onclick="saveWarehouse()">
+					<i class="bx bx-check"></i>
+					Save
+				</button>
 			</div>
 		</div>
 	</div>
 </div>
 <!-- END MODAL -->
 
+<div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalDeleteLabel">Delete</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+				</button>
+			</div>
+			<div class="modal-body">
+				Are you sure want to delete this data
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<input type="hidden" id="CodeDelete" />
+				<input type="hidden" id="From" />
+				<button type="button" class="btn btn-danger radius-8" onclick="confirmDelete()">
+					Delete
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
 <script>
+
 	$(document).ready(function () {
-		var table = $('#tableCategory').DataTable({
-		});
+		refreshDataTable();
+
+		$("#alertBranch").addClass('d-none');
+		$("#alertCategory").addClass('d-none');
+		$("#alertProduct").addClass('d-none');
+		$("#alertWarehouse").addClass('d-none');
 	});
+
+	function refreshDataTable() {
+		$.ajax({
+			url: "?handler=AllCategory",
+			type: "GET",
+			success: function (data) {
+				var table = $('#tableCategory').DataTable({
+					data: data,
+					destroy: true,
+					columns: [
+						{ data: "Code", render: function (data, types, row, meta) { 
+							return '<div class="d-flex order-actions">' +
+								'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editCategory(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
+								'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteCategory(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+								'</div>';
+							} 
+						},
+						{ data: "Code" },
+						{ data: "Name" },
+						{ data: "Description" },
+						{ data: "UserInput" },
+					],
+				})
+			},
+			error: function (xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
+
+		$.ajax({
+			url: "?handler=AllProduct",
+			type: "GET",
+			success: function (data) {
+				var table = $('#tableProduct').DataTable({
+					data: data,
+					destroy: true,
+					columns: [
+						{
+							data: "Code", render: function (data, types, row, meta) {
+								return '<div class="d-flex order-actions">' +
+									'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editProduct(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
+									'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteProduct(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+									'</div>';
+							}
+						},
+						{ data: "Code" },
+						{ data: "Name" },
+						{ data: "Category" },
+						{ data: "Description" },
+						{ data: "UserInput" },
+					],
+				})
+			},
+			error: function (xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
+		
+		$.ajax({
+			url: "?handler=AllBranch",
+			type: "GET",
+			success: function (data) {
+				var table = $('#tableBranch').DataTable({
+					data: data,
+					destroy: true,
+					columns: [
+						{
+							data: "Code", render: function (data, types, row, meta) {
+								return '<div class="d-flex order-actions">' +
+									'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editBranch(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
+									'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteBranch(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+									'</div>';
+							}
+						},
+						{ data: "Code" },
+						{ data: "Name" },
+						{ data: "IsActive", render: function (data, types, row, meta) { 
+								if (data == "Y")
+                                {
+                                    return '<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">Active</div>'
+                                }else{
+                                    return '<div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">Inactive</div>'
+                                }
+							} 
+						},
+						{ data: "UserInput" },
+					],
+				})
+			},
+			error: function (xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
+
+		$.ajax({
+			url: "?handler=AllWarehouse",
+			type: "GET",
+			success: function (data) {
+				var table = $('#tableWarehouse').DataTable({
+					data: data,
+					destroy: true,
+					columns: [
+						{
+							data: "Code", render: function (data, types, row, meta) {
+								return '<div class="d-flex order-actions">' +
+									'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editWarehouse(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
+									'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteWarehouse(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+									'</div>';
+							}
+						},
+						{ data: "Code" },
+						{ data: "Name" },
+						{ data: "Branch" },
+						{ data: "Address" },
+						{ data: "IsActive", render: function (data, types, row, meta) { 
+								if (data == "Y")
+                                {
+                                    return '<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">Active</div>'
+                                }else{
+                                    return '<div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">Inactive</div>'
+                                }
+							} 
+						},
+						{ data: "UserInput" },
+					],
+				})
+			},
+			error: function (xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
+	}
+
+	function confirmDelete() {
+		let dataToSend = {
+			"CodeDelete": $("#CodeDelete").val(),
+			"From": $("#From").val()
+		};
+		$.ajax({
+			url: '?handler=DeleteData',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(dataToSend),
+			success: function (response) {
+				refreshDataTable();
+				$("#modalDelete").modal("hide")
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	// Start Branch
+	function addBranch() {
+		$("#CodeBranch").prop("readonly", false);;
+		$("#CodeBranch").val("");
+		$("#NameBranch").val("");
+		$("#IsNewBranch").val("Y");
+		$("#modalBranchLabel").text("Add Branch");
+
+		$("#modalBranch").modal('show');
+	}
+
+	let deleteBranch = (Code) => {
+		$("#CodeDelete").val(Code);
+		$("#From").val("Branch");
+	}
+
+	function saveBranch() {
+		let dataToSend = {
+			"Code": $("#CodeBranch").val(),
+			"Name": $("#NameBranch").val(),
+			"IsNew": $("#IsNewBranch").val(),
+			"IsActive": IsActiveBranch.checked ? "Y" : "N",
+		};
+		$.ajax({
+			url: '?handler=SaveDataBranch',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(dataToSend),
+			success: function (response) {
+				$("#modalBranch").modal('hide');
+				refreshDataTable();
+				$("#alertBranch").removeClass('d-none')
+				$("#alertBranchText").text("You've successfully saved data.")
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function editBranch(Code) {
+		$.ajax({
+			url: '?handler=ViewDetailBranch&Code=' + Code,
+			type: 'GET',
+			datatype: 'json',
+			success: function (response) {
+				$("#CodeBranch").prop("readonly", true);;
+				$("#CodeBranch").val(response.Code);
+				$("#NameBranch").val(response.Name);
+				IsActiveBranch.checked = (response.IsActive == "Y")
+				$("#IsNewBranch").val("N");
+				$("#modalBranchLabel").text("Edit Branch");
+
+				$("#modalBranch").modal('show');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+	//END Branch
+
+	// Start Category
+	function addCategory() {
+		$("#Code").prop("readonly", false);;
+		$("#Code").val("");
+		$("#Name").val("");
+		$("#Description").val("");
+		$("#IsNew").val("Y");
+		$("#modalCategoryLabel").text("Add Category");
+
+		$("#modalCategory").modal('show');
+	}
+
+	let deleteCategory = (Code) => {
+		$("#CodeDelete").val(Code);
+		$("#From").val("Category");
+	}
+
+	function saveCategory() {
+		let dataToSend = {
+			"Code": $("#Code").val(),
+			"Name": $("#Name").val(),
+			"Description": $("#Description").val(),
+			"IsNew": $("#IsNew").val()
+		};
+		$.ajax({
+			url: '?handler=SaveDataCategory',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(dataToSend),
+			success: function (response) {
+				$("#modalCategory").modal('hide');
+				refreshDataTable();
+				$("#alertCategory").removeClass('d-none')
+				$("#alertCategoryText").text("You've successfully saved data.")
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function editCategory(Code) {
+		$.ajax({
+			url: '?handler=ViewDetailCategory&Code=' + Code,
+			type: 'GET',
+			datatype: 'json',
+			success: function (response) {
+				$("#Code").prop("readonly", true);;
+				$("#Code").val(response.Code);
+				$("#Name").val(response.Name);
+				$("#Description").val(response.Description);
+				$("#IsNew").val("N");
+				$("#modalCategoryLabel").text("Edit Category");
+
+				$("#modalCategory").modal('show');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+	//END Category
+
+	//Start Product
+	function addProduct() {
+		$("#CodeProduct").prop("readonly", false);;
+		$("#CodeProduct").val("");
+		$("#NameProduct").val("");
+		$("#CategoryProduct").val("");
+		$("#DescriptionProduct").val("");
+		$("#IsNewProduct").val("Y");
+		$("#modalProductLabel").text("Add Product");
+
+		$("#modalProduct").modal('show');
+	}
+
+	let deleteProduct = (Code) => {
+		$("#CodeDelete").val(Code);
+		$("#From").val("Product");
+	}
+
+	function editProduct(Code) {
+		$.ajax({
+			url: '?handler=ViewDetailProduct&Code=' + Code,
+			type: 'GET',
+			datatype: 'json',
+			success: function (response) {
+				$("#CodeProduct").prop("readonly", true);;
+				$("#CodeProduct").val(response.Code);
+				$("#NameProduct").val(response.Name);
+				$("#CategoryProduct").val(response.Category);
+				$("#DescriptionProduct").val(response.Description);
+				$("#IsNewProduct").val("N");
+				$("#modalProductLabel").text("Edit Product");
+
+				$("#modalProduct").modal('show');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function saveProduct() {
+		let dataToSend = {
+			"Code": $("#CodeProduct").val(),
+			"Name": $("#NameProduct").val(),
+			"Description": $("#DescriptionProduct").val(),
+			"Category": $("#CategoryProduct").val(),
+			"IsNew": $("#IsNewProduct").val()
+		};
+		$.ajax({
+			url: '?handler=SaveDataProduct',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(dataToSend),
+			success: function (response) {
+				$("#modalProduct").modal('hide');
+				refreshDataTable();
+				$("#alertProduct").removeClass('d-none')
+				$("#alertProductText").text("You've successfully saved data.")
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+	//END Product
+
+	// Start Warehouse
+	function addWarehouse() {
+		$("#CodeWarehouse").prop("readonly", false);;
+		$("#CodeWarehouse").val("");
+		$("#NameWarehouse").val("");
+		$("#BranchWarehouse").val("");
+		$("#AddressWarehouse").val("");
+		$("#IsNewWarehouse").val("Y");
+		$("#modalWarehouseLabel").text("Add Warehouse");
+
+		$("#modalWarehouse").modal('show');
+	}
+
+	let deleteWarehouse = (Code) => {
+		$("#CodeDelete").val(Code);
+		$("#From").val("Warehouse");
+	}
+
+	function saveWarehouse() {
+		let dataToSend = {
+			"Code": $("#CodeWarehouse").val(),
+			"Name": $("#NameWarehouse").val(),
+			"BranchCode": $("#BranchWarehouse").val(),
+			"Address": $("#AddressWarehouse").val(),
+			"IsNew": $("#IsNewWarehouse").val(),
+			"IsActive": IsActiveWarehouse.checked ? "Y" : "N",
+		};
+		$.ajax({
+			url: '?handler=SaveDataWarehouse',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(dataToSend),
+			success: function (response) {
+				$("#modalWarehouse").modal('hide');
+				refreshDataTable();
+				$("#alertWarehouse").removeClass('d-none')
+				$("#alertWarehouseText").text("You've successfully saved data.")
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function editWarehouse(Code) {
+		$.ajax({
+			url: '?handler=ViewDetailWarehouse&Code=' + Code,
+			type: 'GET',
+			datatype: 'json',
+			success: function (response) {
+				$("#CodeWarehouse").prop("readonly", true);;
+				$("#CodeWarehouse").val(response.Code);
+				$("#NameWarehouse").val(response.Name);
+				$("#BranchWarehouse").val(response.BranchCode);
+				$("#AddressWarehouse").val(response.Address);
+				IsActiveWarehouse.checked = (response.IsActive == "Y")
+				$("#IsNewWarehouse").val("N");
+				$("#modalWarehouseLabel").text("Edit Warehouse");
+
+				$("#modalWarehouse").modal('show');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+	//END Warehouse
 </script>

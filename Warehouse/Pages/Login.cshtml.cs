@@ -1,24 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Warehouse.Models;
+using MySql.Data.MySqlClient;
+using System.Data;
+using Warehouse.Class;
 
 namespace Warehouse.Pages
 {
     public class LoginModel : PageModel
     {
-        WarehouseContext _context;
-        IHttpContextAccessor _contextAccessor;
+        readonly IHttpContextAccessor _contextAccessor;
         [BindProperty]
         public string Username{ get; set; }
         
         [BindProperty]
         public string Password { get; set; }
 
-        public LoginModel(WarehouseContext context, IHttpContextAccessor httpContextAccessor)
+        public LoginModel(IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
             _contextAccessor = httpContextAccessor;
-            _context.Database.EnsureCreated();
         }
 
         public void OnGet()
@@ -26,19 +25,23 @@ namespace Warehouse.Pages
 
         }
 
-        public IActionResult OnPost() {
-            var result = _context.User.Find(Username);
-            if (result == null || (result != null && Password != Util.StringFromBase64(result.Password)))
+        public IActionResult OnPostLogin(string UserName, string Password) {
+            using SqlHelper sqlHelper = new ();
+            sqlHelper.commandText = "SELECT * FROM user WHERE UserName = @UserName AND Password = @Password";
+            sqlHelper.AddParameter("@UserName", UserName, MySqlDbType.VarChar);
+            sqlHelper.AddParameter("@Password", Util.GetBase64(Password), MySqlDbType.VarChar);
+            var result = sqlHelper.ExecuteDataTable();
+            if (result.Rows.Count == 0)
             {
                 TempData["ErrorMessage"] = "Invalid Username / Password";
                 return Page();
             }
             else
             {
-                _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_NAME, result.UserName);
-                _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE, result.Role);
-				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE_NAME, Util.RoleName(result.Role));
-				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_FULL_NAME, result.FullName);
+                _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_NAME, result.Rows[0]["UserName"].ToString());
+                _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE, result.Rows[0]["Role"].ToString());
+				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE_NAME, Util.RoleName(result.Rows[0]["Role"].ToString()));
+				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_FULL_NAME, result.Rows[0]["FullName"].ToString());
 
                 return RedirectToPage("/index");
             }

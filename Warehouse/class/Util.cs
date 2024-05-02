@@ -1,4 +1,7 @@
 ﻿namespace Warehouse;
+
+using MySqlX.XDevAPI.Common;
+using System.Data;
 using System.Text;
 
 public class Util
@@ -36,4 +39,46 @@ public class Util
                 return "Guest";
         }
     }
+
+    public static Dictionary<string, object> DataRowToDictionary(DataTable dataTable)
+    {
+        // Get the first row from the DataTable
+        DataRow row = dataTable.Rows[0];
+
+        // Convert the DataRow into a dictionary
+        var data = new Dictionary<string, object>();
+
+        foreach (DataColumn col in dataTable.Columns)
+        {
+            var value = row[col];
+            if (value is DBNull || (value != null && value.ToString() == "{}"))
+            {
+                value = null; // Change {} or DBNull to null
+            }
+
+            data[col.ColumnName] = value;
+        }
+        return data;
+    }
+
+    public static List<Dictionary<string, object>> DataTableToDictionary(DataTable dataTable)
+    {
+		var data = new List<Dictionary<string, object>>();
+		foreach (DataRow row in dataTable.Rows)
+		{
+			var rowData = new Dictionary<string, object>();
+			foreach (DataColumn col in dataTable.Columns)
+			{
+				rowData[col.ColumnName] = row[col]; var value = row[col];
+				if (value is DBNull || (value != null && value.ToString() == "{}"))
+				{
+					value = null; // Change {} or DBNull to null
+				}
+
+				rowData[col.ColumnName] = value;
+			}
+			data.Add(rowData);
+		}
+        return data;
+	}
 }
