@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 02 Bulan Mei 2024 pada 18.09
+-- Waktu pembuatan: 03 Bulan Mei 2024 pada 17.22
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -73,6 +73,38 @@ CREATE TABLE `product` (
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `transaction`
+--
+
+CREATE TABLE `transaction` (
+  `ID` bigint(20) NOT NULL,
+  `WarehouseCode` varchar(100) NOT NULL,
+  `TransactionType` varchar(2) NOT NULL,
+  `TransactionDate` date NOT NULL,
+  `UserInput` varchar(100) NOT NULL,
+  `TimeInput` datetime NOT NULL,
+  `UserEdit` varchar(100) NOT NULL,
+  `TimeEdit` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `transactiondetail`
+--
+
+CREATE TABLE `transactiondetail` (
+  `ID` bigint(20) NOT NULL,
+  `TransactionID` bigint(20) NOT NULL,
+  `ProductCode` varchar(100) NOT NULL,
+  `Quantity` bigint(20) NOT NULL,
+  `UserInput` varchar(100) NOT NULL,
+  `TimeInput` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `user`
 --
 
@@ -80,6 +112,7 @@ CREATE TABLE `user` (
   `UserName` varchar(255) NOT NULL,
   `FullName` varchar(100) NOT NULL,
   `Role` varchar(100) NOT NULL,
+  `BranchCode` varchar(20) DEFAULT NULL,
   `NoHP` varchar(100) NOT NULL,
   `UserInput` varchar(100) DEFAULT NULL,
   `TimeInput` datetime(6) DEFAULT NULL,
@@ -132,6 +165,18 @@ ALTER TABLE `product`
   ADD PRIMARY KEY (`Code`);
 
 --
+-- Indeks untuk tabel `transaction`
+--
+ALTER TABLE `transaction`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indeks untuk tabel `transactiondetail`
+--
+ALTER TABLE `transactiondetail`
+  ADD PRIMARY KEY (`ID`);
+
+--
 -- Indeks untuk tabel `user`
 --
 ALTER TABLE `user`
@@ -142,6 +187,22 @@ ALTER TABLE `user`
 --
 ALTER TABLE `warehouse`
   ADD PRIMARY KEY (`Code`);
+
+--
+-- AUTO_INCREMENT untuk tabel yang dibuang
+--
+
+--
+-- AUTO_INCREMENT untuk tabel `transaction`
+--
+ALTER TABLE `transaction`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `transactiondetail`
+--
+ALTER TABLE `transactiondetail`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
