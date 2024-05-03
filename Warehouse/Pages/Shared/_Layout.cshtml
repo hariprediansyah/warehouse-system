@@ -87,22 +87,25 @@
 			<!--navigation-->
 			<ul class="metismenu" id="menu">
 				<li class="menu-label">Menu</li>
-				<li>
-					<a asp-page="/User">
-						<div class="parent-icon">
-							<i class='bx bxs-user-account'></i>
-						</div>
-						<div class="menu-title">User</div>
-					</a>
-				</li>
-				<li>
-					<a asp-page="/Master">
-						<div class="parent-icon">
-							<i class='bx bx-food-menu'></i>
-						</div>
-						<div class="menu-title">Master</div>
-					</a>
-				</li>
+				@if (Context.Session.GetString(Util.SESSION_USER_ROLE) != Util.ROLE_OPERATOR)
+				{
+					<li>
+						<a asp-page="/User">
+							<div class="parent-icon">
+								<i class='bx bxs-user-account'></i>
+							</div>
+							<div class="menu-title">User</div>
+						</a>
+					</li>
+					<li>
+						<a asp-page="/Master">
+							<div class="parent-icon">
+								<i class='bx bx-food-menu'></i>
+							</div>
+							<div class="menu-title">Master</div>
+						</a>
+					</li>
+				}
 				<li>
 					<a asp-page="/Transaction">
 						<div class="parent-icon">

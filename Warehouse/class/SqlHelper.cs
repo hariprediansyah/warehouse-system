@@ -46,14 +46,27 @@ namespace Warehouse.Class
             return dt.Rows[0];
         }
 
-        public void ExecuteNonQuery()
+		public string ExecuteScalar()
+		{
+			cmd.CommandText = commandText;
+			cmd.CommandType = commandType;
+			MySqlDataReader dr = cmd.ExecuteReader();
+			cmd.CommandText = commandText;
+			cmd.CommandType = commandType;
+			MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+			DataTable dt = new DataTable();
+			adapter.Fill(dt);
+			return dt.Rows[0][0].ToString();
+		}
+
+		public void ExecuteNonQuery()
         {
             cmd.CommandText = commandText;
             cmd.CommandType = commandType;
             cmd.ExecuteNonQuery();
         }
 
-        public void AddParameter(string parameterName, string value, MySqlDbType mySqlDbType)
+        public void AddParameter(string parameterName, object value, MySqlDbType mySqlDbType)
         {
             var param = new MySqlParameter
             {
@@ -62,6 +75,11 @@ namespace Warehouse.Class
                 MySqlDbType = mySqlDbType
             };
             cmd.Parameters.Add(param);
+        }
+
+        public void ClearParameters()
+        {
+            cmd.Parameters.Clear();
         }
 
         protected virtual void Dispose(bool disposing)

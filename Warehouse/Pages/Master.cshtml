@@ -2,11 +2,16 @@
 @using System.Data
 @model Warehouse.Pages.MasterModel
 @{
+	if (Model.HttpContext.Session.GetString(Util.SESSION_USER_ROLE) == Util.ROLE_OPERATOR)
+	{
+		<p>You don't have permission to use this page, <a href="/index">back to home</a></p>
+		return;
+	}
 }
 
 <div class="d-flex align-items-center mb-2">
     <div>
-        <h5 class="font-weight-bold mb-2">Master</h5>
+        <h4 class="font-weight-bold mb-2">Master</h4>
         <p>Manage data master</p>
         <h3>@ViewData["Result"]</h3>
     </div>
@@ -58,13 +63,11 @@
 		</ul>
 		<div class="tab-content py-3">
 			<div class="tab-pane fade show active" id="groupBranch" role="tabpanel">
-				<div class="d-flex align-items-center mb-4">
-					<div>
+				<div>
+					<div class="mb-3">
 						<h5 class="font-weight-bold mb-2">Branch</h5>
 					</div>
-					<div class="ms-auto">
-						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addBranch()"><i class="bx bx-plus"></i>Add New</button>
-					</div>
+					<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addBranch()"><i class="bx bx-plus"></i>Add New</button>
 				</div>
 
 				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertBranch">
@@ -97,14 +100,11 @@
 				</div>
 			</div>
 			<div class="tab-pane fade show" id="groupCategory" role="tabpanel">
-				<div class="d-flex align-items-center mb-4">
-					<div>
-						<h5 class="font-weight-bold">Category</h5>
+				<div>
+					<div class="mb-2">
+						<h5 class="font-weight-bold mb-3">Category</h5>
 					</div>
-					<div class="ms-auto">
-						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addCategory()">
-							<i class="bx bx-plus"></i>Add New</button>
-					</div>
+					<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addCategory()"><i class="bx bx-plus"></i>Add New</button>
 				</div>
 
 				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertCategory">
@@ -137,12 +137,12 @@
 				</div>
 			</div>
 			<div class="tab-pane fade" id="groupProduct" role="tabpanel">
-				<div class="d-flex align-items-center mb-4">
-					<div>
-						<h5 class="font-weight-bold mb-2">Product</h5>
+				<div>
+					<div class="mb-2">
+						<h5 class="font-weight-bold mb-3">Product</h5>
 					</div>
-					<div class="ms-auto">
-						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addProduct()"><i class="bx bx-plus"></i>Add New</button>
+					<div>
+						<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addProduct()"><i class="bx bx-plus"></i>Add New</button>
 					</div>
 				</div>
 
@@ -177,13 +177,11 @@
 				</div>
 			</div>
 			<div class="tab-pane fade" id="groupWarehouse" role="tabpanel">
-				<div class="d-flex align-items-center mb-4">
-					<div>
-						<h5 class="font-weight-bold mb-2">Warehouse</h5>
+				<div>
+					<div class="mb-2">
+						<h5 class="font-weight-bold mb-3">Warehouse</h5>
 					</div>
-					<div class="ms-auto">
-						<button type="button" class="radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addWarehouse()"><i class="bx bx-plus"></i>Add New</button>
-					</div>
+					<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addWarehouse()"><i class="bx bx-plus"></i>Add New</button>
 				</div>
 
 				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertWarehouse">
