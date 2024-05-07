@@ -8,7 +8,9 @@ namespace Warehouse.Class
         const string connectionString = "Server=localhost;Database=Tugas;Uid=sa;Pwd=qwertyuiop;";
         private MySqlConnection connection = null;
         MySqlCommand cmd = null;
-        public string commandText = "";
+        MySqlDataAdapter adapter = null;
+
+		public string commandText = "";
         public CommandType commandType = CommandType.Text;
         private bool disposedValue;
 
@@ -37,23 +39,27 @@ namespace Warehouse.Class
         {
             cmd.CommandText = commandText;
             cmd.CommandType = commandType;
-            MySqlDataReader dr = cmd.ExecuteReader();
-            cmd.CommandText = commandText;
-            cmd.CommandType = commandType;
-            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+            adapter = new MySqlDataAdapter(cmd);
             DataTable dt = new DataTable();
             adapter.Fill(dt);
             return dt.Rows[0];
         }
 
+		public DataSet ExecuteDataSet()
+		{
+			cmd.CommandText = commandText;
+			cmd.CommandType = commandType;
+			adapter = new MySqlDataAdapter(cmd);
+			DataSet ds = new DataSet();
+			adapter.Fill(ds);
+            return ds;
+		}
+
 		public string ExecuteScalar()
 		{
 			cmd.CommandText = commandText;
 			cmd.CommandType = commandType;
-			MySqlDataReader dr = cmd.ExecuteReader();
-			cmd.CommandText = commandText;
-			cmd.CommandType = commandType;
-			MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+			adapter = new MySqlDataAdapter(cmd);
 			DataTable dt = new DataTable();
 			adapter.Fill(dt);
 			return dt.Rows[0][0].ToString();

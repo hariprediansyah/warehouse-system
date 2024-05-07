@@ -17,28 +17,16 @@
 
 		<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addTransaction()"><i class="bx bx-plus"></i>Add New</button>
 
-		<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertTransaction">
-			<div class="d-flex align-items-center">
-				<div class="font-35 text-success">
-					<i class="bx bxs-check-circle"></i>
-				</div>
-				<div class="ms-3">
-					<h6 class="mb-0 text-success">Success!</h6>
-					<div id="alertTransactionText">You've successfully added data.</div>
-				</div>
-			</div>
-			<button type="button" class="btn-close" onclick="$('#alertTransaction').addClass('d-none')" aria-label="Close"></button>
-		</div>
-
 		<div class="table-responsive">
 			<table id="tableTransaction" class="table mb-0 align-middle" style="width:100%">
 				<thead class="table-light">
 					<tr>
 						<th>Action</th>
-						<th>Code</th>
-						<th>Name</th>
+						<th>Warehouse</th>
+						<th>Transaction Type</th>
+						<th>Transaction Date</th>
 						<th>Status</th>
-						<th>User Input</th>
+						<th>Quantity Total</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -61,7 +49,7 @@
 				<input type="hidden" id="IDTransaction" />
 				<div class="mb-3">
 					<label for="TransactionDate" class="form-label">Transaction Date</label>
-					<input type="date" class="form-control" id="TransactionDate" name="TransactionDate" pattern="\d{4}-\d{2}-\d{2}">
+					<input type="date" class="form-control" id="TransactionDate">
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Select Warehouse</label>
@@ -175,16 +163,70 @@
 	</div>
 </div>
 
+<div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalDeleteLabel">Delete</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+				</button>
+			</div>
+			<div class="modal-body">
+				Are you sure want to delete this data
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<input type="hidden" id="CodeDelete" />
+				<input type="hidden" id="From" />
+				<button type="button" class="btn btn-danger radius-8" onclick="confirmDelete()">
+					Delete
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalSubmit" tabindex="-1" aria-labelledby="modalSubmitLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalSubmitLabel">Submit</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+				</button>
+			</div>
+			<div class="modal-body">
+				Are you sure you want to submit this data? Once submitted, this data can't be edited'
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<input type="hidden" id="CodeDelete" />
+				<input type="hidden" id="From" />
+				<button type="button" class="btn btn-success radius-8" onclick="saveSubmitTransaction()">
+					Submit
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 
 
 <script>
 
 	let listProduct = [];
 
+	let IDTransaction = 0;
+
 	$(document).ready(function () {
 		refreshDataTable();
-
-		$("#alertTransaction").addClass('d-none');
 	});
 
 	$(document).on({
@@ -217,14 +259,24 @@
 							data: "ID", render: function (data, types, row, meta) {
 								return '<div class="d-flex order-actions">' +
 									'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editTransaction(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
-									'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteTransaction(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+									'<a type="button" class="text-danger bg-light-danger border-0 me-3" onclick="deleteTransaction(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+									(row.Submitted == "N" || row.Submitted == null || row.Submitted == "" ? '<a type="button" class="text-success bg-light-success border-0" onclick="submitTransaction(\'' + data + '\')"><i class="bx bxs-check-circle"></i></a>' : "") +
 									'</div>';
 							}
 						},
 						{ data: "Warehouse" },
-						{ data: "TransactionType" },
+						{
+							data: "TransactionType", render: function (data, types, row, meta) {
+								return (data == "IN" ? '<div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3">IN</div>' : '<div class="badge rounded-pill text-danger bg-light-danger p-2 text-uppercase px-3">OUT</div>');
+							}
+						},
 						{ data: "TransactionDate" },
-						{ data: "QuantityTotal" },
+						{
+							data: "Submitted", render: function (data, types, row, meta) {
+								return (data == "Y" ? '<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">Submitted</div>' : '<div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">New</div>');
+							}
+						},
+						{ data: "QuantityTotal" }
 					],
 				})
 			},
@@ -241,7 +293,7 @@
 					data: "ID", render: function (data, types, row, meta) {
 						return '<div class="d-flex order-actions">' +
 							'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editProduct(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
-							'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteProduct(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+							'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteProduct(\'' + data + '\')"><i class="bx bxs-trash"></i></a>' +
 							'</div>';
 					}
 				},
@@ -251,8 +303,31 @@
 		})
 	}
 
+	function confirmDelete() {
+		const From = $("#From").val();
+		const ID = $("#CodeDelete").val();
+		if (From == "Transaction") {
+			$.ajax({
+				url: '?handler=DeleteData&ID=' + ID,
+				type: 'POST',
+				contentType: 'application/json',
+				success: function (response) {
+					refreshDataTable();
+					$("#modalDelete").modal("hide")
+				},
+				error: function (xhr, status, error) {
+					console.error('Error:', error);
+				}
+			});
+		} else {
+			listProduct = listProduct.filter(item => item.ID != ID);
+			refreshDataTable();
+			$("#modalDelete").modal("hide");
+		}
+	}
+
 	function addTransaction() {
-		$("#TransactionDate").val("");
+		$("#TransactionDate").val(new Date().toISOString().slice(0, 10));
 		$("#Warehouse").val("");
 		$("#TransactionType").val("");
 		$("#DescriptionTransaction").val("");
@@ -260,6 +335,17 @@
 		$("#modalTransactionLabel").text("Add Transaction");
 
 		$("#modalTransaction").modal('show');
+	}
+
+	let deleteTransaction = (ID) => {
+		$("#CodeDelete").val(ID);
+		$("#From").val("Transaction");
+	}
+
+	let deleteProduct = (ID) => {
+		$("#CodeDelete").val(ID);
+		$("#From").val("Product");
+		$("#modalDelete").modal("show");
 	}
 
 	function addProduct() {
@@ -308,6 +394,74 @@
 		listProduct.push(newProduct);
 		refreshDataTable();
 		$("#modalProduct").modal("hide");
+	}
+
+	function saveTransaction() {
+		const data = {
+			"ID": $("#IDTransaction").val(),
+			"TransactionDate": TransactionDate.value,
+			"WarehouseCode": $("#Warehouse").val(),
+			"TransactionType": $("#TransactionType").val(),
+			"Details": listProduct,
+		};
+
+		$.ajax({
+			url: "?handler=SaveDataTransaction",
+			type: "POST",
+			contentType: 'application/json',
+			data: JSON.stringify(data),
+			success: function (data) {
+				$("#modalTransaction").modal('hide');
+				refreshDataTable();
+			},
+			error: function (xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
+	}
+
+	function editTransaction(ID) {
+		$.ajax({
+			url: '?handler=ViewDetailTransaction&ID=' + ID,
+			type: 'GET',
+			datatype: 'json',
+			success: function (response) {
+				$("#Warehouse").val(response.Transaction.WarehouseCode);
+				$("#TransactionType").val(response.Transaction.TransactionType);
+				$("#TransactionDate").val(response.Transaction.TransactionDate);
+				$("#IDTransaction").val(response.Transaction.ID);
+
+				listProduct = response.Details;
+				refreshDataTable();
+
+				$("#modalTransactionLabel").val('Edit Transaction');
+				$("#modalTransaction").modal('show');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+	
+	let submitTransaction = (ID) => {
+		$("#modalSubmit").modal("show");
+		IDTransaction = ID;
+	}
+
+	function saveSubmitTransaction() {
+		$.ajax({
+			url: '?handler=SubmitTransaction&ID=' + IDTransaction,
+			type: 'POSt',
+			datatype: 'json',
+			success: function (response) {
+				refreshDataTable();
+
+				$("#modalSubmit").modal('hide');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
 	}
 
 	function editProduct(ID) {

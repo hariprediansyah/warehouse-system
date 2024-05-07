@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj": {}
+    "D:\\Project\\warehouse-system\\Warehouse\\Warehouse.csproj": {}
   },
   "projects": {
-    "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj": {
+    "D:\\Project\\warehouse-system\\Warehouse\\Warehouse.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj",
+        "projectUniqueName": "D:\\Project\\warehouse-system\\Warehouse\\Warehouse.csproj",
         "projectName": "Warehouse",
-        "projectPath": "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj",
-        "packagesPath": "C:\\Users\\coyha\\.nuget\\packages\\",
-        "outputPath": "E:\\Projects\\Warehouse\\Warehouse\\obj\\",
+        "projectPath": "D:\\Project\\warehouse-system\\Warehouse\\Warehouse.csproj",
+        "packagesPath": "C:\\Users\\MyBook Z Series\\.nuget\\packages\\",
+        "outputPath": "D:\\Project\\warehouse-system\\Warehouse\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\coyha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\MyBook Z Series\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -34,17 +34,16 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.1.2, )"
+            },
             "MySql.Data": {
               "target": "Package",
               "version": "[8.4.0, )"
@@ -73,7 +72,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

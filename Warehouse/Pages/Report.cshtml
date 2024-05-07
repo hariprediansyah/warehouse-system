@@ -1,8 +1,82 @@
 ﻿@page
+@using System.Data
 @model ReportModel
 @{
     ViewData["Title"] = "Transaction";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="d-flex align-items-center mb-2">
+    <div>
+        <h4 class="font-weight-bold mb-2">Report</h4>
+        <p>Report transaction IN and transaction OUT</p>
+    </div>
+</div>
+
+<div class="card radius-10">
+	<div class="card-body">
+        <div class="mb-3">
+            <label for="TransactionDate" class="form-label">Transaction Date</label>
+            <div class="row align-items-center">
+                <div class="col-lg-2 col-5">
+                    <input type="date" class="form-control" id="DateFrom">
+                </div>
+                <div class="col-auto">to</div>
+                <div class="col-lg-2 col-5">
+                    <input type="date" class="form-control" id="DateTo">
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="form-label">Transaction Type</label>
+            <div class="col-lg-3 col-md-4 col-7">
+                <select class="form-select" id="TransactionType">
+                    <option value="" selected>ALL</option>
+                    <option value='IN'>IN</option>
+                    <option value='OUT'>OUT</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <label class="form-label">Select Warehouse</label>
+            <div class="col-lg-3 col-md-4 col-7">
+                <select class="form-select" id="Warehouse">
+                    <option value="" selected>ALL</option>
+                    @foreach (DataRow dr in Model.GetAllWarehouse().Rows)
+                    {
+                        <option value='@dr["Code"]'>@dr["Name"]</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <button type="button" class="mb-2 radius-8 btn btn-primary" onclick="generate()">
+            <i class="bx bx-line-chart"></i>
+            Generate
+        </button>
+	</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var currentDate = new Date();
+        $("#DateTo").val(currentDate.toISOString().slice(0, 10));
+        currentDate.setDate(currentDate.getDate() - 7);
+        $("#DateFrom").val(currentDate.toISOString().slice(0, 10));
+    });
+
+    function generate() {
+        // $.ajax({
+        //     url: "?handler=SaveDataTransaction",
+        //     type: "POST",
+        //     contentType: 'application/json',
+        //     data: JSON.stringify(data),
+        //     success: function (data) {
+        //         $("#modalTransaction").modal('hide');
+        //         refreshDataTable();
+        //     },
+        //     error: function (xhr, status, error) {
+        //         console.error(xhr.responseText);
+        //     }
+        // });
+        window.location.href = "?handler=Generate&dtFrom=" + $("#DateFrom").val() + "&dtTo=" + $("#DateTo").val() + "&TransactionType=" + $("#TransactionType").val() + "&WarehouseCode=" + $("#Warehouse").val()
+    }
+</script>
