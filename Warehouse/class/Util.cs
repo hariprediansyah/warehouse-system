@@ -81,4 +81,11 @@ public class Util
 		}
         return data;
 	}
+
+	public static Dictionary<string, object> APIResponse(bool ok, string message, object? data = null) => new()
+	{
+		["ok"] = ok,
+		["message"] = message,
+		["data"] = data
+	};
 }

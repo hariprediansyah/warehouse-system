@@ -1,4 +1,7 @@
-﻿@{
+﻿@using Newtonsoft.Json
+@using Warehouse.Class
+@using System.Data
+@{
 	if (Context.Session.GetString(Util.SESSION_USER_NAME) == null)
 	{
 		Context.Response.Redirect("/login");
@@ -41,39 +44,6 @@
 	<script src="assets/js/jquery.min.js"></script>
 </head>
 <body>
-    @* <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Warehouse</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Warehouse - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer> *@
-
 	<!--wrapper-->
 	<div class="wrapper">
 		<div class="sidebar-wrapper" data-simplebar="true">
@@ -148,7 +118,9 @@
 								<a class="dropdown-item" href="javascript:;"><i class="bx bx-user"></i><span>Profile</span></a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="javascript:;"><i class="bx bx-lock"></i><span>Change Password</span></a>
+								<a class="dropdown-item" onclick="changePasswordClick()">
+									<i class="bx bx-lock"></i><span>Change Password</span>
+								</a>
 							</li>
 							<li>
 								<div class="dropdown-divider mb-0"></div>
@@ -164,11 +136,73 @@
 		<!--end header -->
 		<!--start page wrapper -->
 		<div class="page-wrapper">
+			<div class="toast" id="toastMessage" style="position: absolute; top: 10px; right: 20px; z-index: 900;">
+				<div class="toast-header text-success">
+					<div class="me-2">
+						<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0 0 48 48">
+							<path fill="#c8e6c9" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path>
+							<path fill="#4caf50" d="M34.586,14.586l-13.57,13.586l-5.602-5.586l-2.828,2.828l8.434,8.414l16.395-16.414L34.586,14.586z"></path>
+						</svg>
+					</div>
+					<strong class="me-auto">Success</strong>
+					<button type="button" class="me-2 mb-1 btn-close" onclick='$("#toastMessage").toast("hide")' aria-label="Close">
+					</button>
+				</div>
+				<div class="toast-body">
+					Password successfully updated
+				</div>
+			</div>
 			<div class="page-content">
 				@RenderBody()
 			</div>
 		</div>
 		<!--end page wrapper -->
+
+		<div class="modal fade" id="modalChangePassword" tabindex="-1" aria-labelledby="modalChangePasswordLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content radius-10">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalChangePasswordLabel">Change Password</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label for="oldPassword" class="form-label">Old Password</label>
+							<input type="password" class="form-control" id="oldPassword" aria-describedby="msgOldPass" onkeyup="newPasswordChange()" required>
+							<div id="msgOldPass" class="invalid-feedback">
+								Enter your old password
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="newPassword" class="form-label">New Password</label>
+							<input type="password" class="form-control" id="newPassword" onkeyup="newPasswordChange()" aria-describedby="msgNewPass" required>
+							<div id="msgNewPass" class="invalid-feedback">
+								Enter new password
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+							<input type="password" class="form-control" id="confirmNewPassword" onkeyup="newPasswordChange()" aria-describedby="msgNewPassConfirm" required>
+							<div id="msgNewPassConfirm" class="invalid-feedback">
+								Re-enter new password
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary radius-8"
+								data-bs-dismiss="modal">
+							Cancel
+						</button>
+						<button type="button" class="btn btn-primary radius-8" id="btnSaveChangePassword" onclick="saveChangePassword()">
+							<i class="bx bx-check"></i>
+							Save
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!--start overlay-->
 		<div class="overlay toggle-icon"></div>
 		<!--end overlay-->
@@ -180,6 +214,115 @@
 	</div>
 	<!--end wrapper-->
 
+	
+
+	<script>
+		function changePasswordClick() {
+			$("#oldPassword").val("");
+			$("#newPassword").val("");
+			$("#confirmNewPassword").val("");
+
+			$("#oldPassword").removeClass("is-valid is-invalid")
+			$("#newPassword").removeClass("is-valid is-invalid")
+			$("#confirmNewPassword").removeClass("is-valid is-invalid")
+
+			$("#btnSaveChangePassword").prop("disabled", true);
+
+			$("#modalChangePassword").modal("show");
+		}
+
+		function saveChangePassword() {
+			const oldPass = $("#oldPassword");
+			const newPass = $("#newPassword").val();
+			const confirmNewPass = $("#confirmNewPassword").val();
+			const msgOldPass = $("#msgOldPass");
+			const btnSave = $("#btnSaveChangePassword");
+			$.ajax({
+				url: `/Index?handler=ChangePassword&password=${oldPass.val()}&newPassword=${newPass}`,
+				type: 'GET',
+				datatype: 'json',
+				success: function (response) {
+					if (!response.ok) {
+						msgOldPass.text(response.message);
+						oldPass.removeClass("is-valid").addClass("is-invalid");
+
+						btnSave.prop("disabled", true);
+					}else{
+						$("#modalChangePassword").modal("hide");
+						$("#toastMessage").toast('show');
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error('Error:', error);
+				}
+			});
+		}
+
+		function newPasswordChange() {
+			const oldPass = $("#oldPassword");
+			const msgOldPass = $("#msgOldPass");
+			const newPass = $("#newPassword");
+			const confirmNewPass = $("#confirmNewPassword");
+			const msgNewPass = $("#msgNewPass");
+			const msgNewPassConfirm = $("#msgNewPassConfirm");
+			const btnSave = $("#btnSaveChangePassword");
+
+			btnSave.prop("disabled", false);
+
+			if (oldPass.val() == "") {
+				oldPass.removeClass("is-valid").addClass("is-invalid");
+				msgOldPass.text("Enter your old password");
+				btnSave.prop("disabled", true);
+			} else {
+				oldPass.removeClass("is-invalid").addClass("is-valid");
+			}
+
+			if (newPass.val() != confirmNewPass.val()) {
+				newPass.removeClass("is-valid").addClass("is-invalid");
+				confirmNewPass.removeClass("is-valid").addClass("is-invalid");
+
+				msgNewPass.text("Password do not match");
+				msgNewPassConfirm.text("Password do not match");
+				msgNewPass.removeClass("valid-feedback").addClass("invalid-feedback");
+				msgNewPassConfirm.removeClass("valid-feedback").addClass("invalid-feedback");
+
+				btnSave.prop("disabled", true);
+			} else {
+				newPass.removeClass("is-invalid").addClass("is-valid");
+				confirmNewPass.removeClass("is-invalid").addClass("is-valid");
+
+				msgNewPass.text("Password match");
+				msgNewPassConfirm.text("Password match");
+				msgNewPass.removeClass("invalid-feedback").addClass("valid-feedback");
+				msgNewPassConfirm.removeClass("invalid-feedback").addClass("valid-feedback");
+			}
+
+			if (newPass.val() == "") {
+				newPass.removeClass("is-valid").addClass("is-invalid");
+				msgNewPass.text("Enter new password");
+				msgNewPass.removeClass("valid-feedback").addClass("invalid-feedback");
+				btnSave.prop("disabled", true);
+			}
+
+			if (confirmNewPass.val() == "") {
+				confirmNewPass.removeClass("is-valid").addClass("is-invalid");
+				msgNewPassConfirm.text("Re Enter new password");
+				msgNewPassConfirm.removeClass("valid-feedback").addClass("invalid-feedback");
+				btnSave.prop("disabled", true);
+			}
+
+			if (newPass.val() == oldPass.val() && oldPass.val() != "") {
+				newPass.removeClass("is-valid").addClass("is-invalid");
+				confirmNewPass.removeClass("is-valid").addClass("is-invalid");
+				msgNewPass.text("New password cannot be the same as old password");
+				msgNewPassConfirm.text("New password cannot be the same as old password");
+				msgNewPass.removeClass("valid-feedback").addClass("invalid-feedback");
+				msgNewPassConfirm.removeClass("valid-feedback").addClass("invalid-feedback");
+				btnSave.prop("disabled", true);
+			}
+		}
+
+	</script>
     @* <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
 	<script src="assets/js/bootstrap.bundle.min.js"></script>

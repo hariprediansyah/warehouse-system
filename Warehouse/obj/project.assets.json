@@ -2584,19 +2584,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\MyBook Z Series\\.nuget\\packages\\": {}
+    "C:\\Users\\coyha\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Project\\warehouse-system\\Warehouse\\Warehouse.csproj",
+      "projectUniqueName": "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj",
       "projectName": "Warehouse",
-      "projectPath": "D:\\Project\\warehouse-system\\Warehouse\\Warehouse.csproj",
-      "packagesPath": "C:\\Users\\MyBook Z Series\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\warehouse-system\\Warehouse\\obj\\",
+      "projectPath": "E:\\Projects\\Warehouse\\Warehouse\\Warehouse.csproj",
+      "packagesPath": "C:\\Users\\coyha\\.nuget\\packages\\",
+      "outputPath": "E:\\Projects\\Warehouse\\Warehouse\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\MyBook Z Series\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\coyha\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2616,6 +2616,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -2654,7 +2659,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
