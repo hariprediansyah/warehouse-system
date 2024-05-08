@@ -38,6 +38,10 @@ namespace Warehouse.Pages
             }
             else
             {
+                sqlHelper.commandText = "UPDATE user SET LastLogin = CURRENT_TIMESTAMP WHERE UserName = '" + result.Rows[0]["UserName"].ToString() + "'";
+                sqlHelper.ClearParameters();
+                sqlHelper.ExecuteNonQuery();
+
                 _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_NAME, result.Rows[0]["UserName"].ToString());
                 _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE, result.Rows[0]["Role"].ToString());
 				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE_NAME, Util.RoleName(result.Rows[0]["Role"].ToString()));
