@@ -4,7 +4,7 @@
 @{
     if (Model.HttpContext.Session.GetString(Util.SESSION_USER_ROLE) == Util.ROLE_OPERATOR)
     {
-                        <p>You don't have permission to use this page, <a href="/index">back to home</a></p>
+                                                                                                                                                <p>You don't have permission to use this page, <a href="/index">back to home</a></p>
         return;
     }
 }
@@ -35,46 +35,12 @@
                     <th>Role</th>
                     <th>Status</th>
                     <th>Branch</th>
+                    <th>Warehouse</th>
                     <th>No Hp</th>
                     <th>Email</th>
                 </tr>
             </thead>
             <tbody>
-                    @* @foreach (DataRow item in Model.GetAllUser().Rows) { *@
-                    @foreach (DataRow item in Model.GetUserData().Rows)
-                    {
-                        <tr>
-                            <td>
-                                <div class="d-flex order-actions">
-                                    <a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser('@item["UserName"]')">
-                                        <i class="bx bxs-edit"></i>
-                                    </a>
-                                    <a type="button" class="text-danger bg-light-danger border-0" onclick="deleteDataShow('@item["UserName"]')" data-bs-toggle="modal" data-bs-target="#modalDelete">
-                                        <i class="bx bxs-trash">
-                                        </i>
-                                    </a>
-                                </div>
-                            </td>
-                            <td>@item["UserName"]</td>
-                            <td>@item["FullName"]</td>
-                            <td>@item["Role"]</td>
-                            <td>
-                                @if (item["IsActive"].ToString() == "Y")
-                                {
-                                    <div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">
-                                        Active
-                                    </div>
-                                }else{
-                                    <div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">
-                                        Inactive
-                                    </div>
-                                }
-                            </td>
-                            <td>@item["Branch"]</td>
-                            <td>@item["NoHP"]</td>
-                            <td>@item["Email"]</td>
-                        </tr>
-                    }
             </tbody>
         </table>
     </div>
@@ -90,60 +56,88 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal"
 					aria-label="Close"></button>
 			</div>
-			<form method="post">
-                <div class="modal-body">
-                    <input type="hidden" id="OldUserName" name="OldUserName"/>
-                    <div class="mb-3">
-                        <label for="FullName" class="form-label">Full Name</label>
-                        <input type="text" required class="form-control" name="FullName" id="FullName" placeholder="Full Name...">
-                    </div>
-                    <div class="mb-3">
-                        <label for="UserName" class="form-label">User Name</label>
-                        <input type="text" required class="form-control" name="UserName" id="UserName" placeholder="User Name...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Role</label>
-                        <select class="form-select" name="Role" id="Role" onchange="RoleChange()">
-                            <option value="" selected>Select Role...</option>
-                            @if (Model.HttpContext.Session.GetString(Util.SESSION_USER_ROLE) == Util.ROLE_SUPER_ADMIN)
-                            {
-                                <option value="ADM">Admin</option>
-                            }
-                            <option value="OPR">Operator</option>
-                        </select>
-                    </div>
-                    <div class="mb-3" id="inputBranch" >
-                        <label class="form-label">Branch</label>
-                        <select class="form-select" id="BranchCode" name="BranchCode">
-                            <option value="" selected>Select Branch...</option>
-                            @foreach (DataRow dr in Model.GetAllBranch().Rows)
-                            {
-                                <option value='@dr["Code"]'>@dr["Name"]</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="NoHP" class="form-label">No HP</label>
-                        <input type="text" required class="form-control" name="NoHP" id="NoHP" placeholder="No HP...">
-                    </div>
-                    <div class="mb-3">
-                        <label for="Email" class="form-label">Email</label>
-                        <input type="text" required class="form-control" name="Email" id="Email" placeholder="Email...">
-                    </div>
-                    <div class="mb-3">
-                        <label for="" class="form-label">Status</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="IsActive" id="IsActive" checked="">
-                            <label class="form-check-label" for="IsActive">Active</label>
-                        </div>
+            <div class="modal-body">
+                <input type="hidden" id="OldUserName" />
+                <div class="mb-3">
+                    <label for="FullName" class="form-label">Full Name</label>
+                    <input type="text" required class="form-control" id="FullName" onkeyup="validateForm()" aria-describedby="FullNameMsg" placeholder="Full Name...">
+                    <div id="FullNameMsg" class="invalid-feedback">
+                        Full Name cannot empty
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary radius-8"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <input type="submit" class="btn btn-primary radius-8" asp-page-handler="SaveData" value="Save"><i class="bx bx-check"></i></input>
+                <div class="mb-3">
+                    <label for="UserName" class="form-label">User Name</label>
+                    <input type="text" required class="form-control" id="UserName" onkeyup="validateForm()" aria-describedby="UserNameMsg" placeholder="User Name...">
+                    <div id="UserNameMsg" class="invalid-feedback">
+                        User Name cannot empty
+                    </div>
                 </div>
-            </form>
+                <div class="mb-3">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="Role" onchange="RoleChange()" aria-describedby="RoleMsg">
+                        <option value="" selected>Select Role...</option>
+                        @if (Model.HttpContext.Session.GetString(Util.SESSION_USER_ROLE) == Util.ROLE_SUPER_ADMIN)
+                        {
+                            <option value="ADM">Admin</option>
+                        }
+                        <option value="BM">Branch Manager</option>
+                        <option value="OPR">Operator</option>
+                    </select>
+                    <div id="RoleMsg" class="invalid-feedback">
+                        Please select role
+                    </div>
+                </div>
+                <div class="mb-3" id="inputBranch">
+                    <label class="form-label">Branch</label>
+                    <select class="form-select" id="BranchCode" onchange="BranchChange()" aria-describedby="BranchCodeMsg">
+                        <option value="" selected>Select Branch...</option>
+                        @foreach (DataRow dr in Model.GetAllBranch().Rows)
+                        {
+                            <option value='@dr["Code"]'>@dr["Name"]</option>
+                        }
+                    </select>
+                    <div id="BranchCodeMsg" class="invalid-feedback">
+                        Please select branch
+                    </div>
+                </div>
+                <div class="mb-3" id="inputWarehouse" hidden>
+                    <label class="form-label">Warehouse</label>
+                    <select class="form-select" id="Warehouse" onchange="validateForm()" aria-describedby="WarehouseMsg">
+                        <option value="" selected>Select Warehouse...</option>
+                    </select>
+                    <div id="WarehouseMsg" class="invalid-feedback">
+                        Please select warehouse
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="NoHP" class="form-label">No HP</label>
+                    <input type="text" required class="form-control" id="NoHP" onkeyup="validateForm()" aria-describedby="NoHPMsg" placeholder="No HP...">
+                    <div id="NoHPMsg" class="invalid-feedback">
+                        No HP cannot empty
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" required class="form-control" id="Email" onkeyup="validateForm()" aria-describedby="EmailMsg" placeholder="Email...">
+                    <div id="EmailMsg" class="invalid-feedback">
+                        Email cannot empty
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="" class="form-label">Status</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="IsActive" onkeyup="validateForm()" checked="">
+                        <label class="form-check-label" for="IsActive">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary radius-8"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <input type="button" onclick="saveUser()" class="btn btn-primary radius-8" id="btnSave" value="Save"><i class="bx bx-check"></i></input>
+            </div>
 		</div>
 	</div>
 </div>
@@ -165,10 +159,8 @@
                         data-bs-dismiss="modal">
                     Cancel
                 </button>
-                <form method="post">
-                    <input type="hidden" id="hdnUsernameDelete" name="hdnUsernameDelete"/>
-                    <input type="submit" class="btn btn-danger radius-8" asp-page-handler="BtnDelete" value="Delete" />
-                </form>
+                <input type="hidden" id="hdnUsernameDelete"/>
+                <input type="button" class="btn btn-danger radius-8" onclick="confirmDelete()" value="Delete" />
             </div>
         </div>
     </div>
@@ -176,21 +168,187 @@
 
 <script>
     const roleUser = '@Model.HttpContext.Session.GetString(Util.SESSION_USER_ROLE)';
+
 	$(document).ready(function () {
-		var table = $('#tableUser').DataTable({
-		});
+        refreshDataTable();
         
         if (roleUser == "SA") {
             inputBranch.hidden = true;
         }
 	});
 
-    let deleteDataShow = (UserName) => {
+    function validateForm() {
+        let valid = true;
+
+        const listInput = [
+            $("#FullName"),
+            $("#UserName"),
+            $("#Role"),
+            $("#BranchCode"),
+            $("#NoHP"),
+            $("#Email")
+        ];
+        listInput.forEach((item) => {
+            if (item.val() == "") {
+                item.addClass("is-invalid");
+                valid = false;
+            } else {
+                item.removeClass("is-invalid");
+            }
+        });
+
+        if (valid) {
+            $("#btnSave").prop("disabled", false);
+        } else {
+            $("#btnSave").prop("disabled", true);
+        }
+    }
+
+    function confirmDelete() {
+        $.ajax({
+            url: '?handler=DeleteData&UserName=' + $("#hdnUsernameDelete").val(),
+			type: 'POST',
+			contentType: 'application/json',
+			success: function (response) {
+                if (response.ok) {
+                    refreshDataTable();
+                    $("#modalDelete").modal("hide")
+                    $("#toastMessageText").text(response.message);
+                    $("#toastMessage").toast('show');
+                } else {
+                    $("#toastFailedText").text(response.message);
+                    $("#toastFailed").toast("show");
+                }
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+    }
+    function refreshDataTable() {
+        $.ajax({
+            url: "?handler=AllUser",
+            type: "GET",
+            success: function (data) {
+                var table = $('#tableUser').DataTable({
+                    data: data,
+                    destroy: true,
+                    columns: [
+                        {
+                            data: "UserName", render: function (data, types, row, meta) {
+                                return '<div class="d-flex order-actions">' +
+                                    '<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editUser(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
+                                    '<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteUser(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
+                                    '</div>';
+                            }
+                        },
+                        { data: "UserName" },
+                        { data: "FullName" },
+                        {
+                            data: "Role", render: function (data, types, row, meta) {
+                                switch (data) {
+                                    case "ADM":
+                                        return "Admin";
+                                    case "BM":
+                                        return "Branch Manager";
+                                    default:
+                                        return "Operator";
+                                }
+                            }
+                        },
+                        {
+                            data: "IsActive", render: function (data, types, row, meta) {
+                                return data == "Y" ? '<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">Active</div>' : '<div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">Inactive</div>';
+                            }
+                        },
+                        { data: "Branch" },
+                        { data: "Warehouse" },
+                        { data: "NoHP" },
+                        { data: "Email" }
+                    ],
+                })
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    let deleteUser = (UserName) => {
         $("#hdnUsernameDelete").val(UserName);
     }
 
     const RoleChange = () => {
-        inputBranch.hidden = ($("#Role").val() != "OPR");
+        if ($("#Role").val() == "ADM" || $("#Role").val() == "") {
+            inputBranch.hidden = true
+            inputWarehouse.hidden = true;
+            $("#BranchCode").val("A");
+        } else {
+            inputBranch.hidden = false;
+            $("#BranchCode").val("");
+        }
+        validateForm();
+    }
+
+    function BranchChange() {
+        const BranchCode = $("#BranchCode");
+        const Warehouse = $("#Warehouse");
+        if (BranchCode.val() != "" && $("#Role").val() == "OPR") {
+            $.ajax({
+                url: "?handler=AllWarehouse&BranchCode=" + BranchCode.val(),
+                type: "GET",
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data);
+                    Warehouse.empty();
+                    data.data.forEach((item) => {
+                        Warehouse.append('<option value="' + item.Code + '">' + item.Name + '</option>')
+                    });
+                    inputWarehouse.hidden = false;
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        } else {
+            inputWarehouse.hidden = true
+        }
+        validateForm();
+    }
+
+    function saveUser() {
+        const data = {
+            "UserName": $("#UserName").val(),
+            "OldUserName": $("#OldUserName").val(),
+            "FullName": $("#FullName").val(),
+            "Role": $("#Role").val(),
+            "NoHP": $("#NoHP").val(),
+            "Email": $("#Email").val(),
+            "BranchCode": $("#BranchCode").val(),
+            "WarehouseCode": $("#Warehouse").val(),
+            "IsActive": $("#IsActive").checked ? "Y" : "N"
+        };
+
+        $.ajax({
+            url: "?handler=SaveData",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.ok) {
+                    $("#toastMessageText").text(response.message);
+                    $("#toastMessage").toast('show');
+                    $("#modalUser").modal('hide');
+                    refreshDataTable();
+                } else {
+                    $("#toastFailedText").text(response.message);
+                    $("#toastFailed").toast("show");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
     }
 
     function editUser(userName) {
@@ -204,13 +362,22 @@
                 $("#UserName").val(response.UserName);
                 $("#Role").val(response.Role);
                 $("#BranchCode").val(response.BranchCode);
+                $("#WarehouseCode").val(response.WarehouseCode);
                 $("#NoHP").val(response.NoHP);
                 $("#Email").val(response.Email);
                 $("#OldUserName").val(response.UserName);
                 $("#modalUserLabel").text("Edit User");
                 IsActive.checked = (response.IsActive == "Y");
 
-                inputBranch.hidden = (response.Role != "OPR");
+                inputBranch.hidden = (response.Role == "ADM");
+                if (response.Role == "OPR") {
+                    inputWarehouse.hidden = false;
+                    BranchChange();
+                } else {
+                    inputWarehouse.hidden = true;
+                }
+
+                $("#btnSave").prop("disabled", false);
 
                 $("#modalUser").modal('show');
             },
@@ -230,6 +397,21 @@
         $("#BranchCode").val("");
         $("#modalUserLabel").text("Add User");
         IsActive.checked = true;
+        $("#btnSave").prop("disabled", true);
+        inputBranch.hidden = true;
+        inputWarehouse.hidden = true;
+
+        const listInput = [
+            $("#FullName"),
+            $("#UserName"),
+            $("#Role"),
+            $("#BranchCode"),
+            $("#NoHP"),
+            $("#Email")
+        ];
+        listInput.forEach((item) => {
+            item.removeClass("is-valid").removeClass("is-invalid");
+        });
 
         $("#modalUser").modal('show');
     }

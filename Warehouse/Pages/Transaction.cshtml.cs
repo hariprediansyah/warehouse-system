@@ -50,22 +50,57 @@ namespace Warehouse.Pages
 		public IActionResult OnPostSubmitTransaction(string ID)
 		{
 			using SqlHelper sqlHelper = new();
-			sqlHelper.commandText = "UPDATE transaction SET Submitted = 'Y' WHERE ID = @ID; ";
+			if (_contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_ROLE) == "BM"){
+				sqlHelper.commandText = "UPDATE transaction SET Status = 2 WHERE ID = @ID; ";
+			}else {
+				sqlHelper.commandText = "UPDATE transaction SET Status = 1 WHERE ID = @ID; ";
+			}
 			sqlHelper.AddParameter("@ID", ID, MySqlDbType.Int64);
 			sqlHelper.ExecuteNonQuery();
-			return new JsonResult("Success");
+			return new JsonResult("Success submit");
+		}
+
+		public IActionResult OnPostApproveTransaction(string ID)
+		{
+			using SqlHelper sqlHelper = new();
+			sqlHelper.commandText = "UPDATE transaction SET Status = 2, UserApprove = @User, TimeApprove = CURRENT_TIMESTAMP WHERE ID = @ID; ";
+			sqlHelper.AddParameter("@ID", ID, MySqlDbType.Int64);
+			sqlHelper.AddParameter("@User", _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME), MySqlDbType.VarChar);
+			sqlHelper.ExecuteNonQuery();
+			return new JsonResult("Success approve");
+		}
+
+		public IActionResult OnPostDeclineTransaction(string ID)
+		{
+			using SqlHelper sqlHelper = new();
+			sqlHelper.commandText = "UPDATE transaction SET Status = 0 WHERE ID = @ID; ";
+			sqlHelper.AddParameter("@ID", ID, MySqlDbType.Int64);
+			sqlHelper.ExecuteNonQuery();
+			return new JsonResult("Success decline");
 		}
 
 		public IActionResult OnGetAllTransaction()
 		{
 			using SqlHelper sqlHelper = new();
-			sqlHelper.commandText = " SELECT A.ID, C.Name AS Warehouse, Submitted, TransactionType, DATE_FORMAT(TransactionDate, '%d %M %Y') AS TransactionDate, B.QuantityTotal " +
+			sqlHelper.commandText = " SELECT A.ID, C.Name AS Warehouse, Status, TransactionType, DATE_FORMAT(TransactionDate, '%d %M %Y') AS TransactionDate, B.QuantityTotal, A.UserInput, D.FullName AS UserInputName " +
 									" FROM transaction A " +
 									" INNER JOIN (SELECT TransactionID, SUM(Quantity) QuantityTotal " +
 									"		FROM transactionDetail GROUP BY TransactionID) B ON A.ID = B.TransactionID" +
-									" INNER JOIN warehouse C ON A.WarehouseCode = C.Code" +
-									" ORDER BY Submitted ASC, A.TransactionDate DESC, A.TimeInput DESC";
+									" INNER JOIN warehouse C ON A.WarehouseCode = C.Code " +
+									" INNER JOIN user D ON A.UserInput = D.UserName " +
+									" ORDER BY Status ASC, A.TransactionDate DESC, A.TimeInput DESC";
 			return new JsonResult(Util.DataTableToDictionary(sqlHelper.ExecuteDataTable()));
+		}
+
+		public IActionResult OnGetUserDetail()
+		{
+			string UserName = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_NAME);
+			SqlHelper sqlHelper = new();
+			sqlHelper.commandText = " SELECT A.WarehouseCode, B.Name AS WarehouseName FROM User A " +
+									" LEFT JOIN warehouse B ON A.WarehouseCode = B.Code " +
+									" WHERE UserName = @UserName";
+			sqlHelper.AddParameter("@UserName", UserName, MySqlDbType.VarChar);
+			return new JsonResult(Util.DataRowToDictionary(sqlHelper.ExecuteDataTable()));
 		}
 
 		public IActionResult OnPostSaveDataTransaction([FromBody] TransactionDataModel transaction)
@@ -109,7 +144,7 @@ namespace Warehouse.Pages
 		public IActionResult OnGetViewDetailTransaction(string ID)
 		{
 			using SqlHelper sqlHelper = new();
-			sqlHelper.commandText = " SELECT ID, WarehouseCode, Submitted, TransactionType, DATE_FORMAT(TransactionDate, '%Y-%m-%d') AS TransactionDate FROM transaction WHERE ID = @ID;" +
+			sqlHelper.commandText = " SELECT ID, WarehouseCode, Status, TransactionType, DATE_FORMAT(TransactionDate, '%Y-%m-%d') AS TransactionDate, UserInput FROM transaction WHERE ID = @ID;" +
 									" SELECT A.ID, B.Name AS Product, A.ProductCode, A.Quantity FROM transactionDetail A INNER JOIN product B ON A.ProductCode = B.Code " +
 									" WHERE TransactionID = @ID";
 			sqlHelper.AddParameter("@ID", ID, MySqlDbType.VarChar);

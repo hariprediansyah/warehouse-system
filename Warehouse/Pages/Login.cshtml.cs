@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
@@ -46,6 +47,8 @@ namespace Warehouse.Pages
                 _contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE, result.Rows[0]["Role"].ToString());
 				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_ROLE_NAME, Util.RoleName(result.Rows[0]["Role"].ToString()));
 				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_FULL_NAME, result.Rows[0]["FullName"].ToString());
+				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_WAREHOUSE_CODE, result.Rows[0]["WarehouseCode"] == null ? "" : result.Rows[0]["WarehouseCode"].ToString());
+				_contextAccessor.HttpContext.Session.SetString(Util.SESSION_USER_BRANCH_CODE, result.Rows[0]["BranchCode"] == null ? "" : result.Rows[0]["BranchCode"].ToString());
 
                 return RedirectToPage("/index");
             }

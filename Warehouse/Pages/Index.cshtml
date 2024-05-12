@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Data
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -8,54 +9,211 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div> *@
-<div class="card radius-5">
-    <div class="card-body">
-        <div class="container">
-            <p class="fs-4 text-black" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Welcome to Warehouse Management System</p>
-        </div>
-    </div>
-</div>
+<div class="app-card alert alert-dismissible shadow-sm mb-4 border-left-decoration" role="alert">
+	<div class="inner">
+		<div class="app-card-body p-3 p-lg-4">
+			<h3 class="mb-3">Welcome, @HttpContext.Session.GetString(Util.SESSION_FULL_NAME)</h3>
+			<div class="row gx-5 gy-3">
+				<div class="col-12 col-lg-9">
 
-<div class="card radius-5">
-    <div class="card-body">
-        <div class="container">
-            <div class="row mt-4">
-                @if (Model.HttpContext.Session.GetString(Util.SESSION_USER_ROLE) != Util.ROLE_OPERATOR)
-                {
-                    <div class="col-md-6">
-                        <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Master Data</h2>
-                        <ul class="list-group list-unstyled">
-                            <li class="list-group-item">
-                                <a href="/User" class="radius-8 btn btn-outline-primary w-50 align-items-start"><i class="fas fa-users"></i> Manage Users</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="/Master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class="fas fa-box"></i> Manage Branch</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="/Master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class="fas fa-box"></i> Manage Products</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="/Master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class="fas fa-warehouse"></i> Manage Warehouses</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="/Master" class="radius-8 btn btn-outline-primary w-50 align-items-center"><i class='fas fa-tags'></i> Manage Categories</a>
-                            </li>
-                        </ul>
-                    </div>
-                }
-                <div class="col-md-6">
-                    <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Transactions</h2>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <a href="/Transaction" class="radius-8 p-2 btn btn-outline-success w-50 align-items-center">Incoming Transactions</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="/Transaction" class="radius-8 p-2 btn btn-outline-danger w-50 align-items-center">Outgoing Transactions</a>
-                        </li>
-                    </ul>
+					<div>Welcome to the Warehouse Management System. Explore real-time insights, track inventory, manage orders, and optimize operations seamlessly</div>
+				</div><!--//col-->
+			</div><!--//row-->
+		</div><!--//app-card-body-->
+
+	</div><!--//inner-->
+</div><!--//app-card-->
+
+<div class="row g-4 mb-4">
+	<div class="col-6 col-lg-3">
+		<div class="app-card app-card-stat shadow-sm h-100">
+			<div class="app-card-body p-3 p-lg-4">
+				<h4 class="stats-type mb-1">Products</h4>
+				<div class="stats-figure">@Model.ProductCount()</div>
+				<div class="stats-meta">Total</div>
+			</div><!--//app-card-body-->
+			<a class="app-card-link-mask" href="#"></a>
+		</div><!--//app-card-->
+	</div><!--//col-->
+	<div class="col-6 col-lg-3">
+		<div class="app-card app-card-stat shadow-sm h-100">
+			<div class="app-card-body p-3 p-lg-4">
+				<h4 class="stats-type mb-1">Transactions</h4>
+				<div class="stats-figure">@Model.AllTransaction()</div>
+				<div class="stats-meta">
+					Total all time
+				</div>
+			</div><!--//app-card-body-->
+			<a class="app-card-link-mask" href="#"></a>
+		</div><!--//app-card-->
+	</div><!--//col-->
+    <div class="col-6 col-lg-3">
+        <div class="app-card app-card-stat shadow-sm h-100">
+            <div class="app-card-body p-3 p-lg-4">
+                <h4 class="stats-type mb-1">Transactions</h4>
+                <div class="stats-figure">@Model.AllTransactionWeek()</div>
+                <div class="stats-meta">
+                    Total this week
                 </div>
-            </div>
-        </div>
-    </div>
+            </div><!--//app-card-body-->
+            <a class="app-card-link-mask" href="#"></a>
+        </div><!--//app-card-->
+    </div><!--//col-->
+	<div class="col-6 col-lg-3">
+		<div class="app-card app-card-stat shadow-sm h-100">
+			<div class="app-card-body p-3 p-lg-4">
+				<h4 class="stats-type mb-1">Transactions</h4>
+				<div class="stats-figure">@Model.AllTransactionToday()</div>
+				<div class="stats-meta">
+					Total today
+				</div>
+			</div><!--//app-card-body-->
+			<a class="app-card-link-mask" href="#"></a>
+		</div><!--//app-card-->
+	</div><!--//col-->
 </div>
 
+<div class="row g-4 mb-4">
+	<div class="col-12 col-lg-6">
+		<div class="app-card app-card-chart h-100 shadow-sm">
+			<div class="app-card-header p-3">
+				<div class="row justify-content-between align-items-center">
+					<div class="col-auto">
+						<h4 class="app-card-title">Transaction</h4>
+					</div><!--//col-->
+				</div><!--//row-->
+			</div><!--//app-card-header-->
+			<div class="app-card-body p-3 p-lg-4">
+				
+				<div class="chart-container">
+					<canvas id="canvas-barchart"></canvas>
+				</div>
+			</div><!--//app-card-body-->
+		</div><!--//app-card-->
+	</div><!--//col-->
+	<div class="col-12 col-lg-6">
+		<div class="app-card app-card-stats-table h-100 shadow-sm">
+			<div class="app-card-header p-3">
+				<div class="row justify-content-between align-items-center">
+					<div class="col-auto">
+						<h4 class="app-card-title">Product List</h4>
+					</div><!--//col-->
+				</div><!--//row-->
+			</div><!--//app-card-header-->
+			<div class="app-card-body p-3 p-lg-4">
+				<div class="table-responsive">
+					<table class="table table-borderless mb-0">
+						<thead>
+							<tr>
+								<th class="meta">Product Name</th>
+								<th class="meta stat-cell">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							@{
+								// Mulai dengan string kosong untuk menampung baris-baris
+								string tableRows = "";
+
+								// Loop melalui setiap baris dalam hasil GetProductAll()
+								foreach (DataRow item in Model.GetProductAll().Rows)
+								{
+									// Ambil nilai yang diperlukan dari setiap baris, misalnya ProductName dan Stock
+									string productName = item["ProductName"].ToString();
+									string stock = item["Stock"].ToString();
+
+									// Tambahkan baris baru ke dalam string tableRows
+									tableRows += "<tr><td><a href='#'>" + productName + "</a></td><td class='stat-cell'>" + stock + "</td></tr>";
+								}
+
+								// Setelah loop selesai, kembalikan semua baris yang dikumpulkan
+								@Html.Raw(tableRows)
+							}
+						</tbody>
+					</table>
+				</div><!--//table-responsive-->
+			</div><!--//app-card-body-->
+		</div><!--//app-card-->
+	</div><!--//col-->
+</div>
+
+<script>
+	window.chartColors = {
+		green: '#3dc1ff',
+		gray: '#a9b5c9',
+		text: '#252930',
+		border: '#e7e9ed'
+	};
+	$(document).ready(() => {
+		var barChart = document.getElementById('canvas-barchart').getContext('2d');
+		window.myBar = new Chart(barChart, barChartConfig);
+	})
+	var barChartConfig = {
+		type: 'bar',
+
+		data: {
+			labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+			datasets: [{
+				label: 'Transactions',
+				backgroundColor: window.chartColors.green,
+				borderColor: window.chartColors.green,
+				borderWidth: 1,
+				maxBarThickness: 16,
+
+				// data: [
+				// 	1,
+				// 	3,
+				// 	0,
+				// 	15,
+				// 	10,
+				// 	5,
+				// 	0
+				// ]
+				data: @Html.Raw(Json.Serialize(Model.TransactionData()))
+			}]
+		},
+		options: {
+			responsive: true,
+			aspectRatio: 1.5,
+			legend: {
+				position: 'bottom',
+				align: 'end',
+			},
+			title: {
+				display: true,
+				text: 'Total Transaction'
+			},
+			tooltips: {
+				mode: 'index',
+				intersect: false,
+				titleMarginBottom: 10,
+				bodySpacing: 10,
+				xPadding: 16,
+				yPadding: 16,
+				borderColor: window.chartColors.border,
+				borderWidth: 1,
+				backgroundColor: '#fff',
+				bodyFontColor: window.chartColors.text,
+				titleFontColor: window.chartColors.text,
+
+			},
+			scales: {
+				xAxes: [{
+					display: true,
+					gridLines: {
+						drawBorder: false,
+						color: window.chartColors.border,
+					},
+
+				}],
+				yAxes: [{
+					display: true,
+					gridLines: {
+						drawBorder: false,
+						color: window.chartColors.borders,
+					},
+				}]
+			}
+		}
+	}
+
+</script>

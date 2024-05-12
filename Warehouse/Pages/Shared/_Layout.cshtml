@@ -19,6 +19,7 @@
     <title>Warehouse</title>
 
 	<link rel="icon" href="assets/images/index.ico" type="image/png" />
+	<link rel="stylesheet" href="assets/css/new-assets.css" />
 	<!--plugins-->
 	<link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
 	<link href="assets/plugins/fullcalendar/css/main.min.css" rel="stylesheet" />
@@ -57,7 +58,7 @@
 			<!--navigation-->
 			<ul class="metismenu" id="menu">
 				<li class="menu-label">Menu</li>
-				@if (Context.Session.GetString(Util.SESSION_USER_ROLE) != Util.ROLE_OPERATOR)
+				@if (Context.Session.GetString(Util.SESSION_USER_ROLE) != Util.ROLE_OPERATOR && Context.Session.GetString(Util.SESSION_USER_ROLE) != Util.ROLE_BRANCH_MANAGER)
 				{
 					<li>
 						<a asp-page="/User">
@@ -107,16 +108,16 @@
 					</div>
 					<div class="user-box dropdown">
 						<a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							<img src="assets/images/avatars/nanda.jpg" class="user-img" alt="user avatar">
+							<img src="assets/images/avatars/blank.png" class="user-img" alt="user avatar">
 							<div class="user-info ps-3">
 								<p class="user-name mb-0">@Context.Session.GetString(Util.SESSION_FULL_NAME)</p>
 								<p class="designattion mb-0">@Context.Session.GetString(Util.SESSION_USER_ROLE_NAME)</p>
 							</div>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
-							<li>
+							@* <li>
 								<a class="dropdown-item" href="javascript:;"><i class="bx bx-user"></i><span>Profile</span></a>
-							</li>
+							</li> *@
 							<li>
 								<a class="dropdown-item" onclick="changePasswordClick()">
 									<i class="bx bx-lock"></i><span>Change Password</span>
@@ -126,7 +127,7 @@
 								<div class="dropdown-divider mb-0"></div>
 							</li>
 							<li>
-								<a class="dropdown-item" href="/login"><i class='bx bx-log-out-circle'></i><span>Logout</span></a>
+								<a class="dropdown-item text-danger" href="/login"><i class='bx bx-log-out-circle'></i><span>Logout</span></a>
 							</li>
 						</ul>
 					</div>
@@ -149,7 +150,21 @@
 					</button>
 				</div>
 				<div class="toast-body">
-					Password successfully updated
+					<p id="toastMessageText">Password successfully updated</p>
+				</div>
+			</div>
+			<div class="toast" id="toastFailed" style="position: absolute; top: 10px; right: 20px; z-index: 900;">
+				<div class="toast-header text-danger">
+					<div class="me-2">
+						<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" x="0" y="0" viewBox="0 0 60 60" 
+						style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><circle cx="30" cy="30" r="29" fill="#f74850" opacity="1" data-original="#f74850" class=""></circle><path fill="#ffffff" d="m34.218 30 7.373 7.373a1.4 1.4 0 0 1 0 1.976l-2.242 2.242a1.4 1.4 0 0 1-1.976 0L30 34.218l-7.373 7.373a1.4 1.4 0 0 1-1.976 0l-2.242-2.242a1.4 1.4 0 0 1 0-1.976L25.782 30l-7.373-7.373a1.4 1.4 0 0 1 0-1.976l2.242-2.242a1.4 1.4 0 0 1 1.976 0L30 25.782l7.373-7.373a1.4 1.4 0 0 1 1.976 0l2.242 2.242a1.4 1.4 0 0 1 0 1.976z" opacity="1" data-original="#ffffff"></path></g></svg>
+					</div>
+					<strong class="me-auto">Failed</strong>
+					<button type="button" class="me-2 mb-1 btn-close" onclick='$("#toastMessage").toast("hide")' aria-label="Close">
+					</button>
+				</div>
+				<div class="toast-body">
+					<p id="toastFailedText">Please try again later</p>
 				</div>
 			</div>
 			<div class="page-content">
@@ -249,6 +264,7 @@
 						btnSave.prop("disabled", true);
 					}else{
 						$("#modalChangePassword").modal("hide");
+						$("#toastMessageText").text("Password successfully updated");
 						$("#toastMessage").toast('show');
 					}
 				},
@@ -323,7 +339,15 @@
 		}
 
 	</script>
-    @* <script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<!-- Javascript -->@* 
+	<script src="assets/plugins/popper.min.js"></script>
+	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script> *@
+
+	<!-- Charts JS -->
+	<script src="assets/plugins/chartjs/js/Chart.min.js"></script>
+	<script src="assets/js/index-charts.js"></script>
+
+	@* <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
 	<script src="assets/js/bootstrap.bundle.min.js"></script>
 	<!--plugins-->

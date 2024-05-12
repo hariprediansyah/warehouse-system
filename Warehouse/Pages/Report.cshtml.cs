@@ -9,11 +9,10 @@ namespace Warehouse.Pages
 {
     public class ReportModel : PageModel
     {
-        private readonly ILogger<ReportModel> _logger;
-
-        public ReportModel(ILogger<ReportModel> logger)
+        IHttpContextAccessor _contextAccessor;
+        public ReportModel(IHttpContextAccessor contextAccessor)
         {
-            _logger = logger;
+            _contextAccessor = contextAccessor;
         }
 
         public void OnGet()
@@ -22,16 +21,34 @@ namespace Warehouse.Pages
 
         public DataTable GetAllWarehouse()
         {
+            string UserRole = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_ROLE);
+            string WarehouseCode = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_WAREHOUSE_CODE);
+            string BranchCode = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_BRANCH_CODE);
+
             using SqlHelper sqlHelper = new();
             sqlHelper.commandText = " SELECT A.Code, A.Name, A.IsActive, C.Name AS Branch, A.Address, B.FullName AS UserInput " +
                                     " FROM Warehouse A INNER JOIN user B ON A.UserInput = B.UserName" +
-                                    " INNER JOIN branch C ON A.BranchCode = C.Code ORDER BY A.Name ASC";
-            return sqlHelper.ExecuteDataTable();
+                                    " INNER JOIN branch C ON A.BranchCode = C.Code WHERE 1 = 1 ";
+            if (UserRole == "OPR")
+            {
+                sqlHelper.commandText += " AND A.Code = '" + WarehouseCode + "' ";
+            }
+
+            if (UserRole == "BM")
+            {
+				sqlHelper.commandText += " AND C.Code = '" + BranchCode + "' ";
+			}
+            sqlHelper.commandText += " ORDER BY A.Name ASC ";
+			return sqlHelper.ExecuteDataTable();
         }
 
         public IActionResult OnGetGenerate(string dtFrom, string dtTo, string TransactionType, string WarehouseCode)
         {
-            ExcelPackage ep = new ExcelPackage();
+			string UserRole = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_ROLE);
+			string UserWarehouseCode = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_WAREHOUSE_CODE);
+			string BranchCode = _contextAccessor.HttpContext.Session.GetString(Util.SESSION_USER_BRANCH_CODE);
+
+			ExcelPackage ep = new ExcelPackage();
             ExcelWorksheet ws = ep.Workbook.Worksheets.Add("Report");
 
             var dt = new DataTable();
@@ -44,6 +61,7 @@ namespace Warehouse.Pages
                                         "        B.Name AS Warehouse,  " +
                                         "        A.TransactionType AS 'Transaction Type', " +
                                         "        DATE_FORMAT(A.TransactionDate, '%Y-%m-%d') AS 'Transaction Date', " +
+										"        CASE A.Status WHEN 0 THEN 'New' WHEN 1 THEN 'Submitted' ELSE 'Approved' END AS Status, " +
                                         "        A.ID " +
                                         " FROM transaction A " +
                                         " INNER JOIN warehouse B ON A.WarehouseCode = B.Code " +
@@ -56,12 +74,24 @@ namespace Warehouse.Pages
                     sqlHelper.commandText += " AND TransactionType = '" + TransactionType + "' ";
                 }
 
-                if (WarehouseCode != null && WarehouseCode != "")
-                {
-                    sqlHelper.commandText += " AND WarehouseCode = '" + WarehouseCode + "' ";
-                }
+				if (UserRole == "BM")
+				{
+					sqlHelper.commandText += " AND C.Code = '" + BranchCode + "' ";
+				}
 
-                sqlHelper.commandText += " ORDER BY TransactionDate ASC, ID ASC ";
+				if (WarehouseCode != null && WarehouseCode != "")
+                {
+                    sqlHelper.commandText += " AND A.WarehouseCode = '" + WarehouseCode + "' ";
+                }
+                else
+                {
+					if (UserRole == "OPR")
+					{
+						sqlHelper.commandText += " AND A.WarehouseCode = '" + UserWarehouseCode + "' ";
+					}
+				}
+
+				sqlHelper.commandText += " ORDER BY TransactionDate ASC, ID ASC ";
                 dt = sqlHelper.ExecuteDataTable();
 
                 sqlHelper.commandText = " SELECT B.Code AS ProductCode, " +
@@ -97,16 +127,17 @@ namespace Warehouse.Pages
             ws.Cells["C3"].Value = "Warehouse Name";
             ws.Cells["D3"].Value = "Transaction Type";
             ws.Cells["E3"].Value = "Transaction Date";
-            ws.Cells["F3"].Value = "Product Code";
-            ws.Cells["G3"].Value = "Product Name";
-            ws.Cells["H3"].Value = "Quantity";
+            ws.Cells["F3"].Value = "Status";
+            ws.Cells["G3"].Value = "Product Code";
+            ws.Cells["H3"].Value = "Product Name";
+            ws.Cells["I3"].Value = "Quantity";
 
-            ws.Cells[3, 1, 3, 8].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-            ws.Cells[3, 1, 3, 8].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-            ws.Cells[3, 1, 3, 8].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-            ws.Cells[3, 1, 3, 8].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
-            ws.Cells[3, 1, 3, 8].Style.Font.Bold = true;
-            for (int i = 1; i <= 8; i++)
+            ws.Cells[3, 1, 3, 9].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            ws.Cells[3, 1, 3, 9].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+            ws.Cells[3, 1, 3, 9].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            ws.Cells[3, 1, 3, 9].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            ws.Cells[3, 1, 3, 9].Style.Font.Bold = true;
+            for (int i = 1; i <= 9; i++)
             {
                 ws.Cells[3, i].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
             }
@@ -114,9 +145,9 @@ namespace Warehouse.Pages
             int iRow = 4;
             foreach (DataRow dr in dt.Rows)
             {
-                for (int j = 0; j <= 5; j++)
+                for (int j = 0; j <= 6; j++)
                 {
-                    if (j != 5)
+                    if (j != 6)
                     {
                         ws.Cells[iRow, j + 1].Value = dr[j].ToString();
                         ws.Cells[iRow, j + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
@@ -154,8 +185,9 @@ namespace Warehouse.Pages
             ws.Column(4).Width = 18;
             ws.Column(5).Width = 18;
             ws.Column(6).Width = 13;
-            ws.Column(7).Width = 22;
-            ws.Column(8).Width = 13;
+            ws.Column(7).Width = 13;
+            ws.Column(8).Width = 22;
+            ws.Column(9).Width = 13;
 
 
             byte[] fileBytes = ep.GetAsByteArray();

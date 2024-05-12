@@ -62,6 +62,10 @@ namespace Warehouse.Class
 			adapter = new MySqlDataAdapter(cmd);
 			DataTable dt = new DataTable();
 			adapter.Fill(dt);
+            if (dt.Rows.Count == 0)
+            {
+                return "0";
+            }
 			return dt.Rows[0][0].ToString();
 		}
 

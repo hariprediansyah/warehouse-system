@@ -70,19 +70,6 @@
 					<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addBranch()"><i class="bx bx-plus"></i>Add New</button>
 				</div>
 
-				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertBranch">
-					<div class="d-flex align-items-center">
-						<div class="font-35 text-success">
-							<i class="bx bxs-check-circle"></i>
-						</div>
-						<div class="ms-3">
-							<h6 class="mb-0 text-success">Success!</h6>
-							<div id="alertBranchText">You've successfully added data.</div>
-						</div>
-					</div>
-					<button type="button" class="btn-close" onclick="$('#alertBranch').addClass('d-none')" aria-label="Close"></button>
-				</div>
-
 				<div class="table-responsive">
 					<table id="tableBranch" class="table mb-0 align-middle" style="width:100%">
 						<thead class="table-light">
@@ -105,19 +92,6 @@
 						<h5 class="font-weight-bold mb-3">Category</h5>
 					</div>
 					<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addCategory()"><i class="bx bx-plus"></i>Add New</button>
-				</div>
-
-				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertCategory">
-					<div class="d-flex align-items-center">
-						<div class="font-35 text-success">
-							<i class="bx bxs-check-circle"></i>
-						</div>
-						<div class="ms-3">
-							<h6 class="mb-0 text-success">Success!</h6>
-							<div id="alertCategoryText">You've successfully added data.</div>
-						</div>
-					</div>
-					<button type="button" class="btn-close" onclick="$('#alertCategory').addClass('d-none')" aria-label="Close"></button>
 				</div>
 
 				<div class="table-responsive">
@@ -146,19 +120,6 @@
 					</div>
 				</div>
 
-				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertProduct">
-					<div class="d-flex align-items-center">
-						<div class="font-35 text-success">
-							<i class="bx bxs-check-circle"></i>
-						</div>
-						<div class="ms-3">
-							<h6 class="mb-0 text-success">Success!</h6>
-							<div id="alertProductText">You've successfully added data.</div>
-						</div>
-					</div>
-					<button type="button" class="btn-close" onclick="$('#alertProduct').addClass('d-none')" aria-label="Close"></button>
-				</div>
-
 				<div class="table-responsive">
 					<table id="tableProduct" class="table mb-0 align-middle" style="width:100%">
 						<thead class="table-light">
@@ -182,19 +143,6 @@
 						<h5 class="font-weight-bold mb-3">Warehouse</h5>
 					</div>
 					<button type="button" class="mb-2 radius-8 btn btn-outline-primary d-flex align-items-center" onclick="addWarehouse()"><i class="bx bx-plus"></i>Add New</button>
-				</div>
-
-				<div class="alert border-0 border-start border-5 border-success alert-dismissible fade show py-2" id="alertWarehouse">
-					<div class="d-flex align-items-center">
-						<div class="font-35 text-success">
-							<i class="bx bxs-check-circle"></i>
-						</div>
-						<div class="ms-3">
-							<h6 class="mb-0 text-success">Success!</h6>
-							<div id="alertWarehouseText">You've successfully added data.</div>
-						</div>
-					</div>
-					<button type="button" class="btn-close" onclick="$('#alertWarehouse').addClass('d-none')" aria-label="Close"></button>
 				</div>
 
 				<div class="table-responsive">
@@ -429,11 +377,6 @@
 
 	$(document).ready(function () {
 		refreshDataTable();
-
-		$("#alertBranch").addClass('d-none');
-		$("#alertCategory").addClass('d-none');
-		$("#alertProduct").addClass('d-none');
-		$("#alertWarehouse").addClass('d-none');
 	});
 
 	function refreshDataTable() {
@@ -619,8 +562,8 @@
 			success: function (response) {
 				$("#modalBranch").modal('hide');
 				refreshDataTable();
-				$("#alertBranch").removeClass('d-none')
-				$("#alertBranchText").text("You've successfully saved data.")
+				$("#toastMessageText").text("You've successfully saved data");
+				$("#toastMessage").toast('show');
 			},
 			error: function (xhr, status, error) {
 				console.error('Error:', error);
@@ -682,8 +625,8 @@
 			success: function (response) {
 				$("#modalCategory").modal('hide');
 				refreshDataTable();
-				$("#alertCategory").removeClass('d-none')
-				$("#alertCategoryText").text("You've successfully saved data.")
+				$("#toastMessageText").text("You've successfully saved data");
+				$("#toastMessage").toast('show');
 			},
 			error: function (xhr, status, error) {
 				console.error('Error:', error);
@@ -769,8 +712,8 @@
 			success: function (response) {
 				$("#modalProduct").modal('hide');
 				refreshDataTable();
-				$("#alertProduct").removeClass('d-none')
-				$("#alertProductText").text("You've successfully saved data.")
+				$("#toastMessageText").text("You've successfully saved data");
+				$("#toastMessage").toast('show');
 			},
 			error: function (xhr, status, error) {
 				console.error('Error:', error);
@@ -814,8 +757,8 @@
 			success: function (response) {
 				$("#modalWarehouse").modal('hide');
 				refreshDataTable();
-				$("#alertWarehouse").removeClass('d-none')
-				$("#alertWarehouseText").text("You've successfully saved data.")
+				$("#toastMessageText").text("You've successfully saved data");
+				$("#toastMessage").toast('show');
 			},
 			error: function (xhr, status, error) {
 				console.error('Error:', error);

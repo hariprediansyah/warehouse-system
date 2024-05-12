@@ -1,5 +1,6 @@
 ﻿namespace Warehouse;
 
+using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI.Common;
 using System.Data;
 using System.Text;
@@ -10,9 +11,12 @@ public class Util
     public readonly static string SESSION_FULL_NAME = "FullName";
     public readonly static string SESSION_USER_ROLE = "Role";
     public readonly static string SESSION_USER_ROLE_NAME = "RoleName";
+    public readonly static string SESSION_USER_WAREHOUSE_CODE = "WarehouseCode";
+    public readonly static string SESSION_USER_BRANCH_CODE = "BranchCode";
 
     public readonly static string ROLE_ADMIN = "ADM";
     public readonly static string ROLE_SUPER_ADMIN = "SA";
+    public readonly static string ROLE_BRANCH_MANAGER = "BM";
     public readonly static string ROLE_OPERATOR = "OPR";
 
     public static string GetBase64(string text){
@@ -36,7 +40,7 @@ public class Util
             case "OPR":
                 return "Operator";
             default:
-                return "Guest";
+                return "Branch Manager";
         }
     }
 
@@ -88,4 +92,9 @@ public class Util
 		["message"] = message,
 		["data"] = data
 	};
+
+    public static JsonResult ReturnJSON(bool ok, string message, object? data = null)
+    {
+        return new JsonResult(APIResponse(ok, message, data));
+    }
 }

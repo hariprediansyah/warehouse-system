@@ -27,6 +27,7 @@
 						<th>Transaction Date</th>
 						<th>Status</th>
 						<th>Quantity Total</th>
+						<th>User Input</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -64,7 +65,6 @@
 				<div class="mb-3">
 					<label class="form-label">Transaction Type</label>
 					<select class="form-select" id="TransactionType">
-						<option value="" selected>Select Transaction Type...</option>
 						<option value='IN'>IN</option>
 						<option value='OUT'>OUT</option>
 					</select>
@@ -72,7 +72,7 @@
 				<label class="form-label">Product</label>
 				<div class="card">
 					<div class="card-body">
-						<button type="button" class="mb-2 radius-8 btn btn-outline-primary" onclick="addProduct()">
+						<button type="button" id="btnAddProduct" class="mb-2 radius-8 btn btn-outline-primary" onclick="addProduct()">
 							<i class="bx bx-plus"></i>
 							Add Product
 						</button>
@@ -97,7 +97,7 @@
 						data-bs-dismiss="modal">
 					Cancel
 				</button>
-				<button type="button" class="btn btn-primary radius-8" onclick="saveTransaction()">
+				<button id="btnSaveTransaction" type="button" class="btn btn-primary radius-8" onclick="saveTransaction()">
 					<i class="bx bx-check"></i>
 					Save
 				</button>
@@ -200,17 +200,66 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				Are you sure you want to submit this data? Once submitted, this data can't be edited'
+				Are you sure you want to submit this data? Once submitted, this data can't be edited
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary radius-8"
 						data-bs-dismiss="modal">
 					Cancel
 				</button>
-				<input type="hidden" id="CodeDelete" />
 				<input type="hidden" id="From" />
-				<button type="button" class="btn btn-success radius-8" onclick="saveSubmitTransaction()">
+				<button type="button" class="btn btn-primary radius-8" onclick="saveSubmitTransaction()">
 					Submit
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalApprove" tabindex="-1" aria-labelledby="modalApproveLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalApproveLabel">Approve</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+				</button>
+			</div>
+			<div class="modal-body">
+				Are you sure you want to approve this data?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-success radius-8" onclick="saveApproveTransaction()">
+					Approve
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalDecline" tabindex="-1" aria-labelledby="modalDeclineLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content radius-10">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalDeclineLabel">Decline</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+				</button>
+			</div>
+			<div class="modal-body">
+				Are you sure you want to decline this data?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary radius-8"
+						data-bs-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-danger radius-8" onclick="saveDeclineTransaction()">
+					Decline
 				</button>
 			</div>
 		</div>
@@ -257,10 +306,38 @@
 					columns: [
 						{
 							data: "ID", render: function (data, types, row, meta) {
+								var btnApproveSubmit = '';
+								var btnDelete = '';
+								var btnDecline = '';
+
+								const roleUser = '@HttpContext.Session.GetString(Util.SESSION_USER_ROLE)';
+								const userNameUser = '@HttpContext.Session.GetString(Util.SESSION_USER_NAME)';
+
+								if (roleUser == "OPR" && userNameUser == row.UserInput) {
+									btnApproveSubmit = row.Status == 0 ? '<a type="button" class="text-primary bg-light-primary border-0" onclick="submitTransaction(\'' + data + '\')"><i class="bx bxs-check-circle"></i></a>' : "";
+								} else if (roleUser == "BM") {
+									if (row.Status == 1) {
+										btnDecline = '<a type="button" class="text-danger bg-light-danger border-0 me-3" onclick="declineTransaction(\'' + data + '\')"><i class="bx bxs-x-circle"></i></a>';
+										btnApproveSubmit = '<a type="button" class="text-success bg-light-success border-0" onclick="approveTransaction(\'' + data + '\')"><i class="bx bxs-check-circle"></i></a>';
+									}
+									if (row.Status == 0 && userNameUser == row.UserInput) {
+										btnApproveSubmit = '<a type="button" class="text-primary bg-light-primary border-0" onclick="submitTransaction(\'' + data + '\')"><i class="bx bxs-check-circle"></i></a>';
+									}
+								} else if (roleUser == "SA" || roleUser == "ADM") {
+									if (row.Status == 0 && userNameUser == row.UserInput) {
+										btnApproveSubmit = '<a type="button" class="text-primary bg-light-primary border-0" onclick="submitTransaction(\'' + data + '\')"><i class="bx bxs-check-circle"></i></a>';
+									}
+								}
+
+								if (userNameUser == row.UserInput && row.Status == 0) {
+									btnDelete = '<a type="button" class="text-danger bg-light-danger border-0 me-3" onclick="deleteTransaction(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>';
+								}
+
 								return '<div class="d-flex order-actions">' +
 									'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editTransaction(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
-									'<a type="button" class="text-danger bg-light-danger border-0 me-3" onclick="deleteTransaction(\'' + data + '\')" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="bx bxs-trash"></i></a>' +
-									(row.Submitted == "N" || row.Submitted == null || row.Submitted == "" ? '<a type="button" class="text-success bg-light-success border-0" onclick="submitTransaction(\'' + data + '\')"><i class="bx bxs-check-circle"></i></a>' : "") +
+									btnDelete +
+									btnDecline +
+									btnApproveSubmit +
 									'</div>';
 							}
 						},
@@ -272,11 +349,21 @@
 						},
 						{ data: "TransactionDate" },
 						{
-							data: "Submitted", render: function (data, types, row, meta) {
-								return (data == "Y" ? '<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">Submitted</div>' : '<div class="badge rounded-pill text-secondary bg-light-secondary p-2 text-uppercase px-3">New</div>');
+							data: "Status", render: function (data, types, row, meta) {
+								switch (data) {
+									case 0:
+										return '<div class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3">New</div>';
+										break;
+									case 1:
+										return '<div class="badge rounded-pill text-primary bg-light-primary p-2 text-uppercase px-3">Submitted</div>';
+										break;
+									default:
+										return '<div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3">Approved</div>'
+								}
 							}
 						},
-						{ data: "QuantityTotal" }
+						{ data: "QuantityTotal" },
+						{ data: "UserInputName" }
 					],
 				})
 			},
@@ -291,10 +378,10 @@
 			columns: [
 				{
 					data: "ID", render: function (data, types, row, meta) {
-						return '<div class="d-flex order-actions">' +
+						return $("#btnSaveTransaction").prop("hidden") == false ? '<div class="d-flex order-actions">' +
 							'<a type="button" class="text-primary bg-light-primary border-0 me-3" onclick="editProduct(\'' + data + '\')"><i class="bx bxs-edit"></i></a>' +
 							'<a type="button" class="text-danger bg-light-danger border-0" onclick="deleteProduct(\'' + data + '\')"><i class="bx bxs-trash"></i></a>' +
-							'</div>';
+							'</div>' : "";
 					}
 				},
 				{ data: "Product" },
@@ -327,14 +414,31 @@
 	}
 
 	function addTransaction() {
-		$("#TransactionDate").val(new Date().toISOString().slice(0, 10));
-		$("#Warehouse").val("");
-		$("#TransactionType").val("");
-		$("#DescriptionTransaction").val("");
-		$("#IDTransaction").val("");
-		$("#modalTransactionLabel").text("Add Transaction");
+		$.ajax({
+			url: "?handler=UserDetail",
+			type: "GET",
+			contentType: 'application/json',
+			success: function (response) {
+				$("#TransactionDate").val(new Date().toISOString().slice(0, 10));
+				if (response.WarehouseCode != null && response.WarehouseCode != "") {
+					$("#Warehouse").empty();
+					$("#Warehouse").append('<option value="' + response.WarehouseCode + '">' + response.WarehouseName + '</option>')
+				}
+				$("#btnSaveTransaction").prop("hidden", false);
+				$("#btnAddProduct").prop("hidden", false);
+				$("#TransactionType").val("IN");
+				$("#DescriptionTransaction").val("");
+				$("#IDTransaction").val("");
+				$("#modalTransactionLabel").text("Add Transaction");
+				listProduct = [];
+				refreshDataTable();
 
-		$("#modalTransaction").modal('show');
+				$("#modalTransaction").modal('show');
+			},
+			error: function (xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
 	}
 
 	let deleteTransaction = (ID) => {
@@ -431,6 +535,14 @@
 				$("#TransactionDate").val(response.Transaction.TransactionDate);
 				$("#IDTransaction").val(response.Transaction.ID);
 
+				if ('@HttpContext.Session.GetString(Util.SESSION_USER_NAME)' == response.Transaction.UserInput && response.Transaction.Status == 0) {
+					$("#btnSaveTransaction").prop("hidden", false);
+					$("#btnAddProduct").prop("hidden", false);
+				} else {
+					$("#btnSaveTransaction").prop("hidden", true);
+					$("#btnAddProduct").prop("hidden", true);
+				}
+
 				listProduct = response.Details;
 				refreshDataTable();
 
@@ -448,6 +560,16 @@
 		IDTransaction = ID;
 	}
 
+	let approveTransaction = (ID) => {
+		$("#modalApprove").modal("show");
+		IDTransaction = ID;
+	}
+
+	let declineTransaction = (ID) => {
+		$("#modalDecline").modal("show");
+		IDTransaction = ID;
+	}
+
 	function saveSubmitTransaction() {
 		$.ajax({
 			url: '?handler=SubmitTransaction&ID=' + IDTransaction,
@@ -455,8 +577,43 @@
 			datatype: 'json',
 			success: function (response) {
 				refreshDataTable();
-
+				$("#toastMessageText").text(response);
+				$("#toastMessage").toast('show');
 				$("#modalSubmit").modal('hide');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function saveApproveTransaction() {
+		$.ajax({
+			url: '?handler=ApproveTransaction&ID=' + IDTransaction,
+			type: 'POSt',
+			datatype: 'json',
+			success: function (response) {
+				refreshDataTable();
+				$("#toastMessageText").text(response);
+				$("#toastMessage").toast('show');
+				$("#modalApprove").modal('hide');
+			},
+			error: function (xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function saveDeclineTransaction() {
+		$.ajax({
+			url: '?handler=DeclineTransaction&ID=' + IDTransaction,
+			type: 'POSt',
+			datatype: 'json',
+			success: function (response) {
+				refreshDataTable();
+				$("#toastMessageText").text(response);
+				$("#toastMessage").toast('show');
+				$("#modalDecline").modal('hide');
 			},
 			error: function (xhr, status, error) {
 				console.error('Error:', error);
@@ -466,11 +623,12 @@
 
 	function editProduct(ID) {
 		const product = listProduct.find(item => item.ID == ID);
-		alertProduct.hidden = true;
 		$("#Product").val(product.ProductCode);
 		$("#QuantityProduct").val(product.Quantity);
 		$("#IDProduct").val(ID);
 		$("#modalProductLabel").text("Edit Product");
 		$("#modalProduct").modal("show");
 	}
+
+
 </script>
